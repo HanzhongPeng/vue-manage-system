@@ -227,7 +227,7 @@ export const dashOpt1 = {
     xAxis: {
         type: 'category',
         boundaryGap: false,
-        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
     },
     yAxis: {
         type: 'value',
@@ -256,13 +256,13 @@ export const dashOpt1 = {
                 ]),
             },
             smooth: true,
-            data: [120, 132, 301, 134, 90, 230, 210],
+            data: [12, 13, 30, 34, 90, 23, 21],
         },
-        {
-            type: 'line',
-            smooth: true,
-            data: [220, 122, 191, 234, 190, 130, 310],
-        },
+        // {
+        //     type: 'line',
+        //     smooth: true,
+        //     data: [220, 122, 191, 234, 190, 130, 310],
+        // },
     ],
 };
 
@@ -283,11 +283,14 @@ export const dashOpt2 = {
                 borderWidth: 2,
             },
             data: [
-                { value: 1048, name: '数码' },
-                { value: 735, name: '食品' },
-                { value: 580, name: '母婴' },
-                { value: 484, name: '家电' },
-                { value: 300, name: '运动' },
+                { value: 20, name: '访问控制漏洞' },
+                { value: 73, name: '算术漏洞' },
+                { value: 58, name: '拒绝服务漏洞' },
+                { value: 48, name: '抢先交易漏洞' },
+                { value: 30, name: '重入漏洞' },
+                { value: 48, name: '时间操作漏洞' },
+                { value: 30, name: '未检查的低级调用漏洞' },
+                
             ],
         },
     ],

@@ -2,17 +2,17 @@
     "list": [
         {
             "id": 1,
-            "projectName": "智能合约检测系统",
+            "projectName": "项目1",
             "createdAt": "2024-01-01",
-            "description": "用于智能合约漏洞检测的系统",
+            "description": "描述1",
             "owner": "张三",
             "status": "进行中"
         },
         {
             "id": 2,
-            "projectName": "区块链数据分析平台",
+            "projectName": "项目2",
             "createdAt": "2024-02-10",
-            "description": "分析和处理区块链上的数据",
+            "description": "描述2",
             "owner": "李四",
             "status": "已完成"
         }

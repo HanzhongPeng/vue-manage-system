@@ -1,73 +1,74 @@
 <template>
     <div>
-        <el-row :gutter="20" class="mgb20">
+        <el-row :gutter="20" class="mgb20">            
             <el-col :span="6">
                 <el-card shadow="hover" body-class="card-body">
-                    <el-icon class="card-icon bg1">
+                    <!-- <el-icon class="card-icon bg4"> -->
+                        <!-- <ShoppingCartFull /> -->
+                    <!-- </el-icon> -->
+                    <div class="card-content">
+                        <countup class="card-num color4" :end="5" />
+                        <div>项目数量</div>
+                    </div>
+                </el-card>
+            </el-col>
+            <el-col :span="6">
+                <el-card shadow="hover" body-class="card-body">
+                    <!-- <el-icon class="card-icon bg1">
                         <User />
-                    </el-icon>
+                    </el-icon> -->
                     <div class="card-content">
-                        <countup class="card-num color1" :end="6666" />
-                        <div>用户访问量</div>
+                        <countup class="card-num color1" :end="7" />
+                        <div>工具数量</div>
                     </div>
                 </el-card>
             </el-col>
             <el-col :span="6">
                 <el-card shadow="hover" body-class="card-body">
-                    <el-icon class="card-icon bg2">
+                    <!-- <el-icon class="card-icon bg2">
                         <ChatDotRound />
-                    </el-icon>
+                    </el-icon> -->
                     <div class="card-content">
-                        <countup class="card-num color2" :end="168" />
-                        <div>系统消息</div>
+                        <countup class="card-num color2" :end="3" />
+                        <div>策略数量</div>
                     </div>
                 </el-card>
             </el-col>
             <el-col :span="6">
                 <el-card shadow="hover" body-class="card-body">
-                    <el-icon class="card-icon bg3">
+                    <!-- <el-icon class="card-icon bg3">
                         <Goods />
-                    </el-icon>
+                    </el-icon> -->
                     <div class="card-content">
-                        <countup class="card-num color3" :end="8888" />
-                        <div>商品数量</div>
+                        <countup class="card-num color3" :end="35" />
+                        <div>检测出的漏洞数量</div>
                     </div>
                 </el-card>
             </el-col>
-            <el-col :span="6">
-                <el-card shadow="hover" body-class="card-body">
-                    <el-icon class="card-icon bg4">
-                        <ShoppingCartFull />
-                    </el-icon>
-                    <div class="card-content">
-                        <countup class="card-num color4" :end="568" />
-                        <div>今日订单量</div>
-                    </div>
-                </el-card>
-            </el-col>
+
         </el-row>
 
-        <el-row :gutter="20" class="mgb20">
-            <el-col :span="18">
+        <el-row :gutter="24" class="mgb20">
+            <el-col :span="12">
                 <el-card shadow="hover">
                     <div class="card-header">
-                        <p class="card-header-title">订单动态</p>
-                        <p class="card-header-desc">最近一周订单状态，包括订单成交量和订单退货量</p>
+                        <p class="card-header-title">漏洞检测动态</p>
+                        <p class="card-header-desc">最近一周漏洞检测动态</p>
                     </div>
                     <v-chart class="chart" :option="dashOpt1" />
                 </el-card>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="12">
                 <el-card shadow="hover">
                     <div class="card-header">
-                        <p class="card-header-title">品类分布</p>
-                        <p class="card-header-desc">最近一个月销售商品的品类情况</p>
+                        <p class="card-header-title">漏洞种类分布</p>
+                        <p class="card-header-desc">不同种类漏洞分布情况</p>
                     </div>
                     <v-chart class="chart" :option="dashOpt2" />
                 </el-card>
             </el-col>
         </el-row>
-        <el-row :gutter="20">
+        <!-- <el-row :gutter="20">
             <el-col :span="7">
                 <el-card shadow="hover" :body-style="{ height: '400px' }">
                     <div class="card-header">
@@ -122,7 +123,7 @@
                     </div>
                 </el-card>
             </el-col>
-        </el-row>
+        </el-row> -->
     </div>
 </template>
 
