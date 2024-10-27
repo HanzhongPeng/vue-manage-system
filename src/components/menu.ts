@@ -1,10 +1,16 @@
 import { Menus } from '@/types/menu';
 
 export const menuData: Menus[] = [
+    // {
+    //     id: '0',
+    //     title: '系统首页',
+    //     index: '/dashboard',
+    //     icon: 'Odometer',
+    // },
     {
         id: '0',
         title: '系统首页',
-        index: '/dashboard',
+        index: '/graph-chart',
         icon: 'Odometer',
     },
     {

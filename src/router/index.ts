@@ -24,6 +24,15 @@ const routes: RouteRecordRaw[] = [
                 component: () => import(/* webpackChunkName: "dashboard" */ '../views/dashboard.vue'),
             },
             {
+                path: '/graph-chart',
+                name: 'graph-chartd',
+                meta: {
+                    title: '系统首页',
+                    noAuth: true,
+                },
+                component: () => import(/* webpackChunkName: "dashboard" */ '../views/graph-chart.vue'),
+            },
+            {
                 path: '/system-user',
                 name: 'system-user',
                 meta: {
