@@ -1,0 +1,29 @@
+{
+    "list": [
+        {
+            "id": 1,
+            "name": "工具 A",
+            "type": "安全检测",
+            "version": "1.0.0",
+            "description": "用于安全漏洞检测",
+            "status": true
+        },
+        {
+            "id": 2,
+            "name": "工具 B",
+            "type": "性能分析",
+            "version": "2.3.1",
+            "description": "用于性能分析",
+            "status": false
+        },
+        {
+            "id": 3,
+            "name": "工具 C",
+            "type": "代码审查",
+            "version": "3.2.5",
+            "description": "自动代码审查工具",
+            "status": true
+        }
+    ],
+    "pageTotal": 3
+}

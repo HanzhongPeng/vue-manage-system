@@ -91,7 +91,7 @@ const routes: RouteRecordRaw[] = [
                 path: '/icon',
                 name: 'icon',
                 meta: {
-                    title: '图标',
+                    title: '优化算法',
                     permiss: '5',
                 },
                 component: () => import(/* webpackChunkName: "icon" */ '../views/pages/icon.vue'),
@@ -103,6 +103,30 @@ const routes: RouteRecordRaw[] = [
                     title: '个人中心',
                 },
                 component: () => import(/* webpackChunkName: "ucenter" */ '../views/pages/ucenter.vue'),
+            },
+            {
+                path: '/tool',
+                name: 'tool',
+                meta: {
+                    title: '工具管理',
+                },
+                component: () => import(/* webpackChunkName: "ucenter" */ '../views/tool.vue'),
+            },
+            {
+                path: '/strategy',
+                name: 'strategy',
+                meta: {
+                    title: '策略配置',
+                },
+                component: () => import(/* webpackChunkName: "ucenter" */ '../views/strategy.vue'),
+            },
+            {
+                path: '/graph',
+                name: 'graph',
+                meta: {
+                    title: '优化算法',
+                },
+                component: () => import(/* webpackChunkName: "ucenter" */ '../views/graph.vue'),
             },
             {
                 path: '/editor',
@@ -141,13 +165,23 @@ const routes: RouteRecordRaw[] = [
                 component: () => import(/* webpackChunkName: "import" */ '../views/table/import.vue'),
             },
             {
-                path: '/theme',
-                name: 'theme',
+                path: '/project',
+                name: 'project',
                 meta: {
-                    title: '主题设置',
-                    permiss: '7',
+                  title: '项目管理',
+                  permiss: '7',
                 },
-                component: () => import(/* webpackChunkName: "theme" */ '../views/pages/theme.vue'),
+                component: () => import(/* webpackChunkName: "theme" */ '../views/project-list.vue')
+            },
+            {
+                path: '/project/:id', // 独立的项目详情路由
+                name: 'projectDetail',
+                meta: {
+                  title: '项目详情',
+                  permiss: '7',
+                },
+                component: () => import(/* webpackChunkName: "theme" */ '../views/project-detail.vue'),
+                props: true
             },
             {
                 path: '/calendar',

@@ -1,0 +1,29 @@
+{
+    "list": [
+        {
+            "id": 1,
+            "name": "策略 A",
+            "type": "高准确度检测",
+            "version": "1.0.0",
+            "description": "用于高准确度检测",
+            "status": true
+        },
+        {
+            "id": 2,
+            "name": "策略 B",
+            "type": "快速检测",
+            "version": "2.3.1",
+            "description": "用于快速检测",
+            "status": false
+        },
+        {
+            "id": 3,
+            "name": "策略 C",
+            "type": "XXX",
+            "version": "3.2.5",
+            "description": "用于XXX",
+            "status": true
+        }
+    ],
+    "pageTotal": 3
+}
