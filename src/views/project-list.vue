@@ -55,6 +55,8 @@ const columns = ref([
 	{ prop: 'operator', label: '操作', width: 180, slot: 'operator' },
 ]);
 
+
+
 const tableData = ref([]);
 const rowData = ref({});
 const page = reactive({
@@ -95,19 +97,76 @@ const openDialog = (editMode, row = null) => {
 	visible.value = true;
 };
 
+// // 保存项目
+// const saveProject = () => {
+// 	if (!isEdit.value) {
+// 		// 新增项目
+// 		tableData.value.push({
+// 			...rowData.value,
+// 			id: tableData.value.length + 1,
+// 			createdAt: new Date().toISOString()
+// 		});
+// 	}
+// 	closeDialog();
+// 	getData();
+// };
+
+import request from '../utils/request';
+
+// 认证请求
+const authenticate = async () => {
+	const credentials = {
+		username: 'test', // 用户名
+		password: 'test'  // 密码
+	};
+
+	try {
+		const response = await request({
+			url: 'http://localhost:8080/api/auth/login', // 认证接口 URL
+			method: 'POST',
+			data: credentials
+		});
+		if (response) {
+			console.log('Authentication successful:', response.data);
+			// 处理认证成功后的逻辑，例如保存 token 等
+		}
+	} catch (error) {
+		console.error('Authentication failed:', error);
+	}
+};
+
+// 调用认证函数
+authenticate();
+
 // 保存项目
-const saveProject = () => {
+const saveProject = async () => {
+    // console.log(rowData.value.projectName)
 	if (!isEdit.value) {
 		// 新增项目
-		tableData.value.push({
-			...rowData.value,
-			id: tableData.value.length + 1,
-			createdAt: new Date().toISOString()
-		});
+		const newProject = {
+			created_at: new Date().toISOString(), // 只保留创建时间
+			name: rowData.value.projectName // 项目名称
+		};
+
+		try {
+			const response = await request({
+				url: 'http://localhost:8080/api/projects', // 使用提供的接口 URL
+				method: 'POST',
+				data: newProject
+			});
+			if (response) {
+				// 更新 tableData 或其他状态
+				tableData.value.push(response.data); // 假设响应包含新项目数据
+			}
+		} catch (error) {
+			console.error('Error creating project:', error);
+		}
 	}
 	closeDialog();
 	getData();
 };
+
+
 
 // 关闭弹窗
 const closeDialog = () => {

@@ -10,11 +10,8 @@
 			<template #strategyName="{ rows }">
 				<span>{{ rows.name }}</span>
 			</template>
-			<template #strategyType="{ rows }">
-				<span>{{ rows.type }}</span>
-			</template>
-			<template #strategyStatus="{ rows }">
-				<el-switch v-model="rows.status" active-text="启用" inactive-text="停用" @change="handleStatusChange(rows)" />
+			<template #scriptName="{ rows }">
+				<span>{{ rows.scriptName }}</span>
 			</template>
 			<template #operator="{ rows }">
 				<el-button type="primary" size="small" @click="openDialog(true, rows)">编辑</el-button>
@@ -28,14 +25,20 @@
 				<el-form-item label="策略名称">
 					<el-input v-model="strategyData.name" placeholder="请输入策略名称" />
 				</el-form-item>
-				<el-form-item label="策略类型">
-					<el-input v-model="strategyData.type" placeholder="请输入策略类型" />
-				</el-form-item>
-				<el-form-item label="版本">
-					<el-input v-model="strategyData.version" placeholder="请输入版本" />
-				</el-form-item>
-				<el-form-item label="描述">
-					<el-input type="textarea" v-model="strategyData.description" placeholder="请输入策略描述" />
+				<el-form-item label="上传脚本">
+					<el-upload
+						class="upload-demo"
+						drag
+						action="http://jsonplaceholder.typicode.com/api/posts/"
+						multiple
+						:on-change="handleUploadChange"
+					>
+						<el-icon class="el-icon--upload"><upload-filled /></el-icon>
+						<div class="el-upload__text">
+							将文件拖到此处，或
+							<em>点击上传</em>
+						</div>
+					</el-upload>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -55,8 +58,7 @@ import { fetchStrategyData } from '@/api/index';
 const columns = ref([
 	{ type: 'index', label: '序号', width: 55, align: 'center' },
 	{ prop: 'name', label: '策略名称', slot: 'strategyName' },
-	{ prop: 'type', label: '策略类型', slot: 'strategyType' },
-	{ prop: 'status', label: '状态', slot: 'strategyStatus' },
+	{ prop: 'scriptName', label: '策略脚本名称', slot: 'scriptName' },
 	{ prop: 'operator', label: '操作', width: 180, slot: 'operator' },
 ]);
 
@@ -91,10 +93,7 @@ const visible = ref(false);
 const isEdit = ref(false);
 const strategyData = ref({
 	name: '',
-	type: '',
-	version: '',
-	description: '',
-	status: false,
+	scriptName: '',
 });
 
 // 打开弹窗
@@ -103,7 +102,7 @@ const openDialog = (editMode, strategy = null) => {
 	if (editMode && strategy) {
 		strategyData.value = { ...strategy };
 	} else {
-		strategyData.value = { name: '', type: '', version: '', description: '', status: false };
+		strategyData.value = { name: '', scriptName: '' };
 	}
 	visible.value = true;
 };
@@ -111,11 +110,9 @@ const openDialog = (editMode, strategy = null) => {
 // 保存策略
 const saveStrategy = () => {
 	if (isEdit.value) {
-		// 编辑模式：更新策略信息
 		const index = tableData.value.findIndex(item => item.id === strategyData.value.id);
 		if (index > -1) tableData.value.splice(index, 1, { ...strategyData.value });
 	} else {
-		// 新增模式：添加新策略
 		tableData.value.push({
 			...strategyData.value,
 			id: tableData.value.length + 1, // 模拟生成ID
@@ -137,9 +134,11 @@ const handleDelete = (strategy) => {
 	tableData.value = tableData.value.filter(item => item.id !== strategy.id);
 };
 
-// 状态切换
-const handleStatusChange = (strategy) => {
-	console.log(`${strategy.name} 的状态已更改为 ${strategy.status ? '启用' : '停用'}`);
+// 处理上传文件变化
+const handleUploadChange = (fileList) => {
+	if (fileList.length > 0) {
+		strategyData.value.scriptName = fileList[0].name; // 显示上传的文件名称
+	}
 };
 </script>
 
