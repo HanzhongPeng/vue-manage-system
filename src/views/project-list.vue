@@ -7,8 +7,8 @@
 		<TableCustom :columns="columns" :tableData="tableData" :currentPage="page.index" :changePage="changePage">
 			<template #projectName="{ rows }">
 				<span class="project-link" @click="navigateToProject(rows.id)">
-					{{ rows.projectName }}
-				</span>
+                    {{ rows.projectName }}
+                </span>
 			</template>
 			<template #createdAt="{ rows }">
 				{{ rows.createdAt }}
@@ -42,9 +42,14 @@ import { fetchProjectData } from '@/api/index';
 
 const router = useRouter();
 
+// // 路由跳转方法 - 用于跳转到项目详情页面
+// const navigateToProject = (id) => {
+// 	router.push({ name: 'projectDetail', params: { id } });
+// };
+
 // 路由跳转方法 - 用于跳转到项目详情页面
-const navigateToProject = (id) => {
-	router.push({ name: 'projectDetail', params: { id } });
+const navigateToProject = (projectId) => {
+  router.push({ name: 'projectDetail', params: { id: projectId } });
 };
 
 // 表格列配置
@@ -65,17 +70,61 @@ const page = reactive({
 	total: 0,
 });
 
+// // 获取项目数据并更新表格
+// const getData = async () => {
+// 	try {
+// 		const res = await fetchProjectData();
+// 		tableData.value = res.data.list;
+// 		page.total = res.data.pageTotal;
+// 	} catch (error) {
+// 		console.error("获取数据失败：", error);
+// 	}
+// };
+// onMounted(() => getData());
+
+// 获取项目数据并更新表格
+// 获取项目数据并更新表格
 // 获取项目数据并更新表格
 const getData = async () => {
-	try {
-		const res = await fetchProjectData();
-		tableData.value = res.data.list;
-		page.total = res.data.pageTotal;
-	} catch (error) {
-		console.error("获取数据失败：", error);
-	}
+  try {
+    const response = await request({
+      url: `http://localhost:8080/api/projects`,
+      method: 'GET'
+    });
+
+    // 检查响应数据是否成功
+    if (response && response.status === 200 && Array.isArray(response.data)) {
+      // 映射数据到表格
+      tableData.value = response.data.map(project => ({
+        id: project.id, // 序号
+        projectName: project.name, // 项目名称
+        createdAt: formatDate(project.created_at) // 格式化创建时间
+      }));
+      // 更新总项目数
+      page.total = tableData.value.length;
+    } else {
+      console.error("获取项目列表失败，数据格式不正确");
+    }
+  } catch (error) {
+    console.error("获取项目数据失败：", error);
+  }
 };
+
+// 格式化创建时间
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleString(); // 使用本地时间格式显示
+};
+
+
+// // 时间格式化函数
+// const formatDate = (isoString) => {
+//   const date = new Date(isoString);
+//   return date.toLocaleString(); // 使用本地格式化
+// };
+
 onMounted(() => getData());
+
 
 // 分页切换
 const changePage = (pageIndex) => {
@@ -87,14 +136,16 @@ const changePage = (pageIndex) => {
 const visible = ref(false);
 const isEdit = ref(false);
 
+// 打开编辑/新增项目弹窗
 const openDialog = (editMode, row = null) => {
-	isEdit.value = editMode;
-	if (editMode && row) {
-		rowData.value = { ...row };
-	} else {
-		rowData.value = { projectName: '' }; // 清空表单数据
-	}
-	visible.value = true;
+  isEdit.value = editMode;
+  if (editMode && row) {
+    // 复制项目数据到 rowData，以便在弹窗中显示和编辑
+    rowData.value = { ...row };
+  } else {
+    rowData.value = { projectName: '' }; // 清空表单数据
+  }
+  visible.value = true;
 };
 
 // // 保存项目
@@ -139,32 +190,61 @@ const authenticate = async () => {
 authenticate();
 
 // 保存项目
+// 保存项目
 const saveProject = async () => {
-    // console.log(rowData.value.projectName)
-	if (!isEdit.value) {
-		// 新增项目
-		const newProject = {
-			created_at: new Date().toISOString(), // 只保留创建时间
-			name: rowData.value.projectName // 项目名称
-		};
+  const projectData = {
+    id: rowData.value.id || 0,
+    name: rowData.value.projectName,
+    created_at: rowData.value.createdAt || new Date().toISOString(),
+    editable: true,
+    filepath: "./"
+  };
 
-		try {
-			const response = await request({
-				url: 'http://localhost:8080/api/projects', // 使用提供的接口 URL
-				method: 'POST',
-				data: newProject
-			});
-			if (response) {
-				// 更新 tableData 或其他状态
-				tableData.value.push(response.data); // 假设响应包含新项目数据
-			}
-		} catch (error) {
-			console.error('Error creating project:', error);
-		}
-	}
-	closeDialog();
-	getData();
+  try {
+    if (isEdit.value) {
+      // 编辑项目
+      const response = await request({
+        url: `http://localhost:8080/api/projects/${projectData.id}`,
+        method: 'PUT',
+        data: projectData
+      });
+
+      if (response && response.status === 200) {
+        // 更新 tableData 中的项目数据
+        const updatedProject = response.data;
+        const index = tableData.value.findIndex(item => item.id === updatedProject.id);
+        if (index !== -1) {
+          tableData.value[index] = {
+            id: updatedProject.id,
+            projectName: updatedProject.name,
+            createdAt: updatedProject.created_at
+          };
+        }
+      }
+    } else {
+      // 新增项目
+      const newProject = {
+        created_at: new Date().toISOString(),
+        name: rowData.value.projectName
+      };
+
+      const response = await request({
+        url: 'http://localhost:8080/api/projects',
+        method: 'POST',
+        data: newProject
+      });
+
+      if (response) {
+        tableData.value.push(response.data);
+      }
+    }
+    closeDialog();
+    getData();
+  } catch (error) {
+    console.error(isEdit.value ? '编辑项目失败:' : '新增项目失败:', error);
+  }
 };
+
 
 
 
@@ -175,11 +255,32 @@ const closeDialog = () => {
 	rowData.value = {};
 };
 
-// 删除项目
-const handleDelete = (row) => {
-	tableData.value = tableData.value.filter((item) => item.id !== row.id);
+
+// // 删除项目
+const handleDelete = async (row) => {
+  try {
+    const response = await request({
+      url: `http://localhost:8080/api/projects/${row.id}`,
+      method: 'DELETE'
+    });
+
+    // 检查删除是否成功
+    if (response && response.status === 200) {
+      // 从 tableData 中移除被删除的项目
+      tableData.value = tableData.value.filter(item => item.id !== row.id);
+      console.log(`项目 ID ${row.id} 删除成功`);
+    }
+  } catch (error) {
+    console.error(`删除项目 ID ${row.id} 失败:`, error);
+  }
 };
-</script>
+// 删除项目
+// const handleDelete = (row) => {
+// 	tableData.value = tableData.value.filter((item) => item.id !== row.id);
+// };
+// </script>
+
+
 
 <style scoped>
 .project-link {

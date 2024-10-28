@@ -3,12 +3,10 @@
 		<!-- 项目名称显示在页面左上角 -->
 		<h1 class="project-title">{{ projectInfo.projectName }}</h1>
 
+		<!-- 项目详情卡片，仅显示项目名称和创建时间 -->
 		<el-card class="project-details-card" shadow="hover">
 			<el-descriptions title="项目详情" :column="2" border>
-				<el-descriptions-item label="创建时间">{{ projectInfo.createdAt }}</el-descriptions-item>
-				<el-descriptions-item label="负责人">{{ projectInfo.owner }}</el-descriptions-item>
-				<el-descriptions-item label="状态">{{ projectInfo.status }}</el-descriptions-item>
-				<el-descriptions-item label="描述">{{ projectInfo.description }}</el-descriptions-item>
+				<el-descriptions-item label="创建时间">{{ formattedCreatedAt }}</el-descriptions-item>
 			</el-descriptions>
 		</el-card>
 
@@ -18,9 +16,12 @@
 			<el-upload
 				class="upload-demo"
 				drag
-				action="http://jsonplaceholder.typicode.com/api/posts/"
+				:action="uploadUrl"
+				:headers="headers"
 				multiple
-				:on-change="handleFileChange"
+				:on-success="handleUploadSuccess"
+				:on-error="handleUploadError"
+				:data="uploadData"
 			>
 				<el-icon><upload-filled /></el-icon>
 				<div class="el-upload__text">
@@ -29,13 +30,8 @@
 			</el-upload>
 		</div>
 
-		<!-- 检测工具和策略选择 -->
+		<!-- 检测策略选择 -->
 		<el-form label-width="120px" class="selection-form">
-			<el-form-item label="检测工具">
-				<el-select v-model="selectedTool" placeholder="请选择检测工具">
-					<el-option v-for="tool in tools" :key="tool.value" :label="tool.label" :value="tool.value" />
-				</el-select>
-			</el-form-item>
 			<el-form-item label="检测策略">
 				<el-select v-model="selectedStrategy" placeholder="请选择检测策略">
 					<el-option v-for="strategy in strategies" :key="strategy.value" :label="strategy.label" :value="strategy.value" />
@@ -49,12 +45,11 @@
 			<el-button type="success" @click="exportReport">导出报告</el-button>
 		</div>
 
-		<!-- 历史扫描结果 -->
+		<!-- 扫描结果 -->
 		<div class="section">
-			<h3>历史扫描结果</h3>
+			<h3>扫描结果</h3>
 			<el-table :data="scanHistory" style="width: 100%">
 				<el-table-column prop="fileName" label="代码文件名称" />
-				<el-table-column prop="tool" label="检测工具" />
 				<el-table-column prop="strategy" label="策略" />
 				<el-table-column prop="date" label="扫描时间" width="180" />
 				<el-table-column prop="vulnerabilities" label="漏洞数量" width="150" />
@@ -72,7 +67,7 @@
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { ElMessage } from 'element-plus';
-import { fetchProjectData } from '@/api/index';
+import request from '@/utils/request'; // 引入请求函数
 
 // 路由参数和项目信息
 const route = useRoute();
@@ -81,26 +76,29 @@ const projectId = route.params.id; // 获取传递过来的项目ID
 const projectInfo = ref({
 	projectName: '',
 	createdAt: '',
-	owner: '',
-	status: '',
-	description: '',
 });
 
-// 获取项目数据
+// 格式化后的创建时间
+const formattedCreatedAt = ref('');
+
+// 使用新接口获取项目数据
 const getProjectData = async () => {
 	try {
-		const res = await fetchProjectData();
-		const project = res.data.list.find((item) => item.id === Number(projectId));
-		if (project) {
+		const response = await request({
+			url: `http://localhost:8080/api/projects/${projectId}`,
+			method: 'GET'
+		});
+		// 检查返回状态并处理数据
+		if (response && response.status === 200) {
+			const project = response.data;
 			projectInfo.value = {
-				projectName: project.projectName,
-				createdAt: project.createdAt,
-				owner: project.owner,
-				status: project.status,
-				description: project.description,
+				projectName: project.name,
+				createdAt: project.created_at,
 			};
+			// 格式化创建时间
+			formattedCreatedAt.value = new Date(project.created_at).toLocaleString();
 		} else {
-			projectInfo.value.projectName = '项目不存在';
+			ElMessage.error("项目不存在");
 		}
 	} catch (error) {
 		console.error("获取项目数据失败：", error);
@@ -108,43 +106,47 @@ const getProjectData = async () => {
 	}
 };
 
-// 上传文件处理
-const handleFileChange = (file) => {
-	console.log('文件上传:', file);
+// 上传文件接口的URL和参数
+const uploadUrl = `http://localhost:8080/api/projects/${projectId}/upload`;
+const headers = { /* 在此配置需要的headers */ };
+const uploadData = { id: projectId }; // 上传请求的附加参数
+
+// 上传成功和失败的处理
+const handleUploadSuccess = () => {
+	ElMessage.success("文件上传成功");
 };
 
-// 检测工具和策略
-const tools = [
-	{ label: '工具 A', value: 'toolA' },
-	{ label: '工具 B', value: 'toolB' },
-	{ label: '工具 C', value: 'toolC' },
-];
+const handleUploadError = (error) => {
+	console.error("文件上传失败：", error);
+	ElMessage.error("文件上传失败");
+};
+
+// 检测策略选择
 const strategies = [
 	{ label: '策略 X', value: 'strategyX' },
 	{ label: '策略 Y', value: 'strategyY' },
 	{ label: '策略 Z', value: 'strategyZ' },
 ];
-const selectedTool = ref('');
 const selectedStrategy = ref('');
 
 // 操作按钮事件
 const startScan = () => {
-	if (!selectedTool.value || !selectedStrategy.value) {
-		ElMessage.error('请先选择工具和策略');
+	if (!selectedStrategy.value) {
+		ElMessage.error('请先选择检测策略');
 		return;
 	}
-	console.log('开始扫描:', selectedTool.value, selectedStrategy.value);
+	console.log('开始扫描，策略:', selectedStrategy.value);
 };
 
 const exportReport = () => {
 	ElMessage.success('报告已导出');
 };
 
-// 历史扫描记录
+// 扫描结果
 const scanHistory = ref([
-	{ fileName: 'main.py', tool: '工具 A', strategy: '策略 X', date: '2024-10-01', vulnerabilities: 5 },
-	{ fileName: 'module1.js', tool: '工具 B', strategy: '策略 Y', date: '2024-10-02', vulnerabilities: 2 },
-	{ fileName: 'app.java', tool: '工具 C', strategy: '策略 Z', date: '2024-10-03', vulnerabilities: 1 },
+	{ fileName: 'main.py', strategy: '策略 X', date: '2024-10-01', vulnerabilities: 5 },
+	{ fileName: 'module1.js', strategy: '策略 Y', date: '2024-10-02', vulnerabilities: 2 },
+	{ fileName: 'app.java', strategy: '策略 Z', date: '2024-10-03', vulnerabilities: 1 },
 ]);
 
 // 查看扫描详情
