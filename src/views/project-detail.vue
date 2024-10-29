@@ -1,9 +1,7 @@
 <template>
 	<div class="project-container">
-		<!-- 项目名称显示在页面左上角 -->
 		<h1 class="project-title">{{ projectInfo.projectName }}</h1>
 
-		<!-- 项目详情卡片，仅显示项目名称和创建时间 -->
 		<el-card class="project-details-card" shadow="hover">
 			<el-descriptions title="项目详情" :column="2" border>
 				<el-descriptions-item label="创建时间">{{ formattedCreatedAt }}</el-descriptions-item>
@@ -33,8 +31,8 @@
 		<!-- 检测策略选择 -->
 		<el-form label-width="120px" class="selection-form">
 			<el-form-item label="检测策略">
-				<el-select v-model="selectedStrategy" placeholder="请选择检测策略">
-					<el-option v-for="strategy in strategies" :key="strategy.value" :label="strategy.label" :value="strategy.value" />
+				<el-select v-model="selectedStrategyId" placeholder="请选择检测策略">
+					<el-option v-for="strategy in strategies" :key="strategy.id" :label="strategy.name" :value="strategy.id" />
 				</el-select>
 			</el-form-item>
 		</el-form>
@@ -67,11 +65,11 @@
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { ElMessage } from 'element-plus';
-import request from '@/utils/request'; // 引入请求函数
+import request from '@/utils/request';
 
 // 路由参数和项目信息
 const route = useRoute();
-const projectId = route.params.id; // 获取传递过来的项目ID
+const projectId = route.params.id;
 
 const projectInfo = ref({
 	projectName: '',
@@ -81,21 +79,19 @@ const projectInfo = ref({
 // 格式化后的创建时间
 const formattedCreatedAt = ref('');
 
-// 使用新接口获取项目数据
+// 获取项目数据
 const getProjectData = async () => {
 	try {
 		const response = await request({
 			url: `http://localhost:8080/api/projects/${projectId}`,
 			method: 'GET'
 		});
-		// 检查返回状态并处理数据
 		if (response && response.status === 200) {
 			const project = response.data;
 			projectInfo.value = {
 				projectName: project.name,
 				createdAt: project.created_at,
 			};
-			// 格式化创建时间
 			formattedCreatedAt.value = new Date(project.created_at).toLocaleString();
 		} else {
 			ElMessage.error("项目不存在");
@@ -106,10 +102,33 @@ const getProjectData = async () => {
 	}
 };
 
+// 获取策略列表
+const strategies = ref([]);
+const getStrategies = async () => {
+	try {
+		const response = await request({
+			url: 'http://localhost:8080/api/strategies',
+			method: 'GET'
+		});
+		if (response && response.status === 200) {
+			// 将策略列表保存到 strategies
+			strategies.value = response.data.map(strategy => ({
+				id: strategy.id,
+				name: strategy.name
+			}));
+		} else {
+			ElMessage.error("获取策略列表失败");
+		}
+	} catch (error) {
+		console.error("获取策略列表失败：", error);
+		ElMessage.error("获取策略列表失败");
+	}
+};
+
 // 上传文件接口的URL和参数
 const uploadUrl = `http://localhost:8080/api/projects/${projectId}/upload`;
 const headers = { /* 在此配置需要的headers */ };
-const uploadData = { id: projectId }; // 上传请求的附加参数
+const uploadData = { id: projectId };
 
 // 上传成功和失败的处理
 const handleUploadSuccess = () => {
@@ -122,20 +141,16 @@ const handleUploadError = (error) => {
 };
 
 // 检测策略选择
-const strategies = [
-	{ label: '策略 X', value: 'strategyX' },
-	{ label: '策略 Y', value: 'strategyY' },
-	{ label: '策略 Z', value: 'strategyZ' },
-];
-const selectedStrategy = ref('');
+const selectedStrategyId = ref(''); // 存储选择的策略ID
 
 // 操作按钮事件
 const startScan = () => {
-	if (!selectedStrategy.value) {
+	if (!selectedStrategyId.value) {
 		ElMessage.error('请先选择检测策略');
 		return;
 	}
-	console.log('开始扫描，策略:', selectedStrategy.value);
+	console.log('开始扫描，使用策略 ID:', selectedStrategyId.value);
+	// 在这里添加调用开始扫描的接口
 };
 
 const exportReport = () => {
@@ -154,9 +169,10 @@ const viewScanDetails = (row) => {
 	console.log('查看扫描详情:', row);
 };
 
-// 初始化时获取项目数据
+// 初始化时获取项目和策略数据
 onMounted(() => {
 	getProjectData();
+	getStrategies();
 });
 </script>
 
