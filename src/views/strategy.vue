@@ -168,15 +168,19 @@ const createStrategy = async () => {
 };
 
 
-// 修改后的 updateStrategy
 const updateStrategy = async () => {
     try {
+        // 获取当前策略的完整信息，以确保创建时间保持不变
+        const currentStrategy = tableData.value.find(item => item.id === strategyData.value.id);
+
         const response = await request({
             url: `http://localhost:8080/api/strategies/${strategyData.value.id}`,
             method: 'PUT',
             data: {
-                name: strategyData.value.name,
-                script: strategyData.value.script,
+                id: strategyData.value.id,
+                name: strategyData.value.name, // 更新名称
+                script: strategyData.value.script, // 保持 script 字段不变
+                created_at: currentStrategy?.createdAt || strategyData.value.createdAt // 保持创建时间不变
             },
         });
 
@@ -192,6 +196,7 @@ const updateStrategy = async () => {
         ElMessage.error("编辑策略失败");
     }
 };
+
 
 // 在 closeDialog 中重置 visible 状态，确保每次操作后都执行
 const closeDialog = () => {
