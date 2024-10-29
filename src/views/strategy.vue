@@ -36,22 +36,19 @@
 			</div>
 		</el-dialog>
 
-		<!-- 上传策略脚本弹窗 -->
 		<el-dialog title="上传脚本" v-model="uploadVisible" width="500px" destroy-on-close>
 			<el-upload
 				class="upload-demo"
+				:action="uploadUrl"  
+				:http-request="customUploadRequest" 
 				drag
-				:action="uploadUrl"
-				multiple
-				:on-success="handleUploadSuccess"
-				:on-error="handleUploadError"
-				:data="uploadData"
 			>
 				<el-icon class="el-icon--upload"><upload-filled /></el-icon>
 				<div class="el-upload__text">
 					将文件拖到此处，或 <em>点击上传</em>
 				</div>
 			</el-upload>
+
 			<div slot="footer" class="dialog-footer">
 				<el-button @click="closeUploadDialog">取消</el-button>
 			</div>
@@ -140,50 +137,173 @@ const openDialog = (editMode, strategy = null) => {
 	}
 	visible.value = true;
 };
+// 修改后的 createStrategy
+const createStrategy = async () => {
+    try {
+        const response = await request({
+            url: 'http://localhost:8080/api/strategies',
+            method: 'POST',
+            data: {
+                name: strategyData.value.name,
+                script: 'default',
+                created_at: new Date().toISOString(),
+            },
+        });
 
-// 保存策略
+        console.log("创建策略响应:", response); // 检查返回的 response 对象
+
+        if (response?.data?.id) {
+            ElMessage.success('新增策略成功');
+            await getData();
+            closeDialog();
+        } else {
+            ElMessage.success('新增策略成功');
+			await getData();
+            closeDialog();
+        }
+    } catch (error) {
+        console.error("新增策略失败：", error.response ? error.response.data : error.message);
+        ElMessage.error("新增策略失败");
+    }
+};
+
+
+// 修改后的 updateStrategy
+const updateStrategy = async () => {
+    try {
+        const response = await request({
+            url: `http://localhost:8080/api/strategies/${strategyData.value.id}`,
+            method: 'PUT',
+            data: {
+                name: strategyData.value.name,
+                script: strategyData.value.script,
+            },
+        });
+
+        if (response && response.status === 200) {
+            ElMessage.success('编辑策略成功');
+            await getData(); // 刷新策略列表
+            closeDialog(); // 确保弹窗关闭
+        } else {
+            ElMessage.error('编辑策略失败');
+        }
+    } catch (error) {
+        console.error("编辑策略失败：", error.response ? error.response.data : error.message);
+        ElMessage.error("编辑策略失败");
+    }
+};
+
+// 在 closeDialog 中重置 visible 状态，确保每次操作后都执行
+const closeDialog = () => {
+    visible.value = false;
+    isEdit.value = false;
+    strategyData.value = { id: 0, name: '', script: 'default', createdAt: '' }; // 重置表单数据
+};
+
 const saveStrategy = async () => {
-	try {
-		const response = await request({
-			url: 'http://localhost:8080/api/strategies',
-			method: 'POST',
-			data: {
-				name: strategyData.value.name,
-				script: 'default',
-				created_at: new Date().toISOString(),
-			},
-		});
-
-		if (response.status === 201) {
-			ElMessage.success('策略保存成功');
-			await getData(); // 重新获取策略列表
-		} else {
-			ElMessage.error('保存策略失败');
-		}
-	} catch (error) {
-		console.error("保存策略失败：", error);
-		ElMessage.error("保存策略失败");
-	}
-	closeDialog();
+    try {
+        if (isEdit.value) {
+            await updateStrategy();
+        } else {
+            await createStrategy();
+        }
+    } finally {
+        closeDialog(); // 确保无论操作成功或失败，最终关闭弹窗
+    }
 };
 
-// 打开上传脚本弹窗
-const openUploadDialog = (strategy) => {
-	currentStrategyId.value = strategy.id;
-	uploadUrl.value = `http://localhost:8080/api/projects/${currentStrategyId.value}/upload`;
-	uploadData.id = currentStrategyId.value; // 确保将策略ID传递给上传参数
-	uploadVisible.value = true;
-};
 
 // 上传相关
 const uploadUrl = ref('');
 const uploadData = reactive({
-	id: null,
+    id: null,
 });
+
+const openUploadDialog = (strategy) => {
+    currentStrategyId.value = strategy.id;
+    uploadUrl.value = `http://localhost:8080/api/strategies/${currentStrategyId.value}/upload`;
+    uploadData.id = currentStrategyId.value;
+    uploadVisible.value = true;
+};
+
+// 自定义上传逻辑
+const customUploadRequest = async ({ file, onSuccess, onError }) => {
+    const formData = new FormData();
+    formData.append("script", file); // 使用自定义文件字段名 `script`
+    formData.append("id", currentStrategyId.value);
+
+    try {
+        // 第一步：上传文件
+        const response = await request({
+            url: uploadUrl.value,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+            data: formData,
+        });
+
+        if (response && response.status === 200) {
+            const uploadedFileName = file.name; // 获取文件名
+            ElMessage.success("脚本上传成功");
+
+            // 第二步：调用更新接口更新 script 字段
+            await updateStrategyScript(uploadedFileName);
+
+            onSuccess(response.data); // 通知上传成功
+            await getData(); // 刷新策略列表
+            closeUploadDialog(); // 关闭上传弹窗
+        } else {
+            ElMessage.error("脚本上传失败");
+            onError(new Error("上传失败"));
+        }
+    } catch (error) {
+        console.error("脚本上传失败：", error);
+        ElMessage.error("脚本上传失败");
+        onError(error); // 通知上传失败
+    }
+};
+
+
+const updateStrategyScript = async (fileName) => {
+    try {
+        // 获取当前策略的名称和创建时间
+        const currentStrategy = tableData.value.find(item => item.id === currentStrategyId.value);
+
+        const response = await request({
+            url: `http://localhost:8080/api/strategies/${currentStrategyId.value}`,
+            method: 'PUT',
+            data: {
+                id: currentStrategyId.value,
+                name: currentStrategy?.name || strategyData.value.name, // 保持名称不变
+                script: fileName, // 更新 script 字段为上传的文件名
+                created_at: currentStrategy?.createdAt || strategyData.value.createdAt // 保持创建时间不变
+            },
+        });
+
+        if (response && response.status === 200) {
+            ElMessage.success("策略信息更新成功");
+        } else {
+            ElMessage.error("更新策略信息失败");
+        }
+    } catch (error) {
+        console.error("更新策略信息失败：", error);
+        ElMessage.error("更新策略信息失败");
+    }
+};
+
+
+
+// 关闭上传弹窗
+const closeUploadDialog = () => {
+    uploadVisible.value = false;
+};
+
+
+
 
 const handleUploadSuccess = async (response, file) => {
 	try {
-		// 上传成功后，更新策略中的 script 字段
 		await request({
 			url: `http://localhost:8080/api/strategies/${currentStrategyId.value}`,
 			method: 'PUT',
@@ -200,20 +320,21 @@ const handleUploadSuccess = async (response, file) => {
 	}
 };
 
+
 const handleUploadError = (error) => {
 	console.error("文件上传失败：", error);
 	ElMessage.error("文件上传失败");
 };
 
-// 关闭弹窗
-const closeDialog = () => {
-	visible.value = false;
-	isEdit.value = false;
-};
+// // 关闭弹窗
+// const closeDialog = () => {
+// 	visible.value = false;
+// 	isEdit.value = false;
+// };
 
-const closeUploadDialog = () => {
-	uploadVisible.value = false;
-};
+// const closeUploadDialog = () => {
+// 	uploadVisible.value = false;
+// };
 
 // 删除策略
 const handleDelete = async (strategy) => {
