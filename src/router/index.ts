@@ -24,6 +24,15 @@ const routes: RouteRecordRaw[] = [
                 component: () => import(/* webpackChunkName: "dashboard" */ '../views/dashboard.vue'),
             },
             {
+                path: '/result',
+                name: 'result',
+                meta: {
+                    title: '策略结果展示',
+                    noAuth: true,
+                },
+                component: () => import(/* webpackChunkName: "dashboard" */ '../views/result.vue'),
+            },
+            {
                 path: '/graph-chart',
                 name: 'graph-chartd',
                 meta: {
@@ -133,7 +142,7 @@ const routes: RouteRecordRaw[] = [
                 path: '/graph',
                 name: 'graph',
                 meta: {
-                    title: '优化算法',
+                    title: '基于异构图的多级源码漏洞检测',
                 },
                 component: () => import(/* webpackChunkName: "ucenter" */ '../views/graph.vue'),
             },

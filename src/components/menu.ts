@@ -9,82 +9,82 @@ export const menuData: Menus[] = [
     },
     
     
-    {
-        id: '2',
-        title: '组件',
-        index: '2-1',
-        icon: 'Calendar',
-        children: [
-            {
-                id: '21',
-                pid: '3',
-                index: '/form',
-                title: '表单',
-            },
-            {
-                id: '22',
-                pid: '3',
-                index: '/upload',
-                title: '上传',
-            },
-            {
-                id: '23',
-                pid: '2',
-                index: '/carousel',
-                title: '走马灯',
-            },
-            {
-                id: '24',
-                pid: '2',
-                index: '/calendar',
-                title: '日历',
-            },
-            {
-                id: '25',
-                pid: '2',
-                index: '/watermark',
-                title: '水印',
-            },
-            {
-                id: '26',
-                pid: '2',
-                index: '/tour',
-                title: '分布引导',
-            },
-            {
-                id: '27',
-                pid: '2',
-                index: '/steps',
-                title: '步骤条',
-            },
-            {
-                id: '28',
-                pid: '2',
-                index: '/statistic',
-                title: '统计',
-            },
-            {
-                id: '29',
-                pid: '3',
-                index: '29',
-                title: '三级菜单',
-                children: [
-                    {
-                        id: '291',
-                        pid: '29',
-                        index: '/editor',
-                        title: '富文本编辑器',
-                    },
-                    {
-                        id: '292',
-                        pid: '29',
-                        index: '/markdown',
-                        title: 'markdown编辑器',
-                    },
-                ],
-            },
-        ],
-    },
+    // {
+    //     id: '2',
+    //     title: '组件',
+    //     index: '2-1',
+    //     icon: 'Calendar',
+    //     children: [
+    //         {
+    //             id: '21',
+    //             pid: '3',
+    //             index: '/form',
+    //             title: '表单',
+    //         },
+    //         {
+    //             id: '22',
+    //             pid: '3',
+    //             index: '/upload',
+    //             title: '上传',
+    //         },
+    //         {
+    //             id: '23',
+    //             pid: '2',
+    //             index: '/carousel',
+    //             title: '走马灯',
+    //         },
+    //         {
+    //             id: '24',
+    //             pid: '2',
+    //             index: '/calendar',
+    //             title: '日历',
+    //         },
+    //         {
+    //             id: '25',
+    //             pid: '2',
+    //             index: '/watermark',
+    //             title: '水印',
+    //         },
+    //         {
+    //             id: '26',
+    //             pid: '2',
+    //             index: '/tour',
+    //             title: '分布引导',
+    //         },
+    //         {
+    //             id: '27',
+    //             pid: '2',
+    //             index: '/steps',
+    //             title: '步骤条',
+    //         },
+    //         {
+    //             id: '28',
+    //             pid: '2',
+    //             index: '/statistic',
+    //             title: '统计',
+    //         },
+    //         {
+    //             id: '29',
+    //             pid: '3',
+    //             index: '29',
+    //             title: '三级菜单',
+    //             children: [
+    //                 {
+    //                     id: '291',
+    //                     pid: '29',
+    //                     index: '/editor',
+    //                     title: '富文本编辑器',
+    //                 },
+    //                 {
+    //                     id: '292',
+    //                     pid: '29',
+    //                     index: '/markdown',
+    //                     title: 'markdown编辑器',
+    //                 },
+    //             ],
+    //         },
+    //     ],
+    // },
     // {
     //     id: '3',
     //     title: '表格',
@@ -144,19 +144,20 @@ export const menuData: Menus[] = [
     //     title: '图标',
     //     permiss: '5',
     // },
-    {
-        id: '5',
-        icon: 'Guide',
-        index: '/graph',
-        title: '优化算法',
-        permiss: '5',
-    },
-    {
-        id: '0',
-        title: '算法结果展示',
-        index: '/graph-chart',
-        icon: 'Odometer',
-    },
+    // {
+    //     id: '5',
+    //     icon: 'Guide',
+    //     index: '/graph',
+    //     title: '基于异构图的多级漏洞检测算法',
+    //     permiss: '5',
+    // },
+
+    // {
+    //     id: '0',
+    //     title: '算法结果展示',
+    //     index: '/graph-chart',
+    //     icon: 'Odometer',
+    // },
     // {
     //     id: '7',
     //     icon: 'Brush',
@@ -168,6 +169,13 @@ export const menuData: Menus[] = [
         icon: 'Brush',
         index: '/project',
         title: '项目管理',
+    },
+    {
+        id: '4',
+        icon: 'Guide',
+        index: '/tool',
+        title: '工具信息',
+        permiss: '6',
     },
     // {
     //     id: '6',
@@ -221,12 +229,12 @@ export const menuData: Menus[] = [
         permiss: '6',
     },
     {
-        id: '4',
-        icon: 'Guide',
-        index: '/tool',
-        title: '工具信息展示',
-        permiss: '6',
+        id: '3',
+        icon: 'Calendar',
+        index: '/result',
+        title: '策略结果展示',
     },
+
     // {
     //     id: '6',
     //     icon: 'DocumentAdd',
@@ -248,29 +256,50 @@ export const menuData: Menus[] = [
     //     ],
     // },
     {
-        id: '1',
-        title: '系统管理',
-        index: '1',
-        icon: 'HomeFilled',
+        id: '5',
+        icon: 'Guide',
+        index: '5',
+        title: '基于异构图的多级漏洞检测算法',
         children: [
-            {
-                id: '11',
-                pid: '1',
-                index: '/system-user',
-                title: '用户管理',
-            },
-            {
-                id: '12',
-                pid: '1',
-                index: '/system-role',
-                title: '角色管理',
-            },
-            {
-                id: '13',
-                pid: '1',
-                index: '/system-menu',
-                title: '菜单管理',
-            },
-        ],
+                    {
+                        id: '51',
+                        pid: '5',
+                        index: '/graph',
+                        title: '源码漏洞检测',
+                    },
+                    {
+                        id: '52',
+                        pid: '5',
+                        index: '/graph-chart',
+                        title: '漏洞检测效果对比',
+                    }
+                ]
+
     },
+    // {
+    //     id: '1',
+    //     title: '系统管理',
+    //     index: '1',
+    //     icon: 'HomeFilled',
+    //     children: [
+    //         {
+    //             id: '11',
+    //             pid: '1',
+    //             index: '/system-user',
+    //             title: '用户管理',
+    //         },
+    //         {
+    //             id: '12',
+    //             pid: '1',
+    //             index: '/system-role',
+    //             title: '角色管理',
+    //         },
+    //         {
+    //             id: '13',
+    //             pid: '1',
+    //             index: '/system-menu',
+    //             title: '菜单管理',
+    //         },
+    //     ],
+    // },
 ];
