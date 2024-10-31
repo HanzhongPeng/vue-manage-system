@@ -3,7 +3,7 @@
         <div class="login-container">
             <div class="login-header">
                 <img class="logo mr10" src="../../assets/img/logo.svg" alt="" />
-                <div class="login-title">智能合约漏洞检测系统</div>
+                <div class="login-title">H-Precision多策略智能合约漏洞检测平台</div>
             </div>
             <el-form :model="param" :rules="rules" ref="login" size="large">
                 <el-form-item prop="username">
@@ -36,7 +36,7 @@
                 <el-button class="login-btn" type="primary" size="large" @click="submitForm(login)">登录</el-button>
                 <p class="login-tips"></p>
                 <p class="login-text">
-                    没有账号？<el-link type="primary" @click="$router.push('/register')">立即注册</el-link>
+                    没有账号？(默认用户名admin 密码admin)<el-link type="primary" @click="$router.push('/register')">立即注册</el-link>
                 </p>
             </el-form>
         </div>

@@ -109,10 +109,16 @@ const routes: RouteRecordRaw[] = [
                 path: '/icon',
                 name: 'icon',
                 meta: {
-                    title: '优化算法',
+                    title: '基于异构图的多级漏洞检测算法',
                     permiss: '5',
                 },
                 component: () => import(/* webpackChunkName: "icon" */ '../views/pages/icon.vue'),
+            },
+            {
+                path: '/scan-detail/:fileName',
+                name: 'scanDetail',
+                component: () => import('@/views/ScanDetail.vue'),
+                props: true,  // 允许通过路由传递参数
             },
             {
                 path: '/ucenter',

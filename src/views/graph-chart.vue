@@ -6,70 +6,74 @@
 		</div> -->
 		<el-card class="mgb20" shadow="hover">
 			<template #header>
-				<div class="content-title">优化算法与传统算法Buggy-F1对比</div>
+				<div class="content-title">基于异构图的多级漏洞检测算法与传统算法Buggy-F1对比</div>
 			</template>
 			<schart class="schart" canvasId="buggy-f1" :options="optionsBuggyF1"></schart>
 		</el-card>
 		<el-card class="mgb20" shadow="hover">
 			<template #header>
-				<div class="content-title">优化算法与传统算法Macro-F1对比</div>
+				<div class="content-title">基于异构图的多级漏洞检测算法与传统算法Macro-F1对比</div>
 			</template>
 			<schart class="schart" canvasId="macro-f1" :options="optionsMacroF1"></schart>
 		</el-card>
-        <el-card class="mgb20" shadow="hover">
+        <!-- <el-card class="mgb20" shadow="hover">
 			<template #header>
-				<div class="content-title">优化算法与图神经网络算法Buggy-F1对比</div>
+				<div class="content-title">基于异构图的多级漏洞检测算法与图神经网络算法Buggy-F1对比</div>
 			</template>
 			<schart class="schart" canvasId="buggy-f1-graph" :options="optionsBuggyF1graph"></schart>
 		</el-card>
         <el-card class="mgb20" shadow="hover">
 			<template #header>
-				<div class="content-title">优化算法与图神经网络算法Macro-F1对比</div>
+				<div class="content-title">基于异构图的多级漏洞检测算法与图神经网络算法Macro-F1对比</div>
 			</template>
 			<schart class="schart" canvasId="macro-f1-graph" :options="optionsMacroF1graph"></schart>
-		</el-card>
+		</el-card> -->
 	</div>
 </template>
 
 <script setup lang="ts" name="schart">
 import Schart from 'vue-schart';
 
-// Buggy F1 数据对比图表配置
+// Buggy-F1 数据对比图表配置
 const optionsBuggyF1 = {
 	type: 'bar',
 	title: {
-		text: ' 优化算法与传统算法比较 (Buggy F1)'
+		text: '基于异构图的多级漏洞检测算法与传统算法比较 (Buggy F1)'
 	},
 	colorList: ["#3f51b5", "#009688", "#f44336", "#00bcd4", "#1ABC9C", "#FF9800", "#8BC34A", "#795548"],
 	labels: ['访问控制漏洞', '算术漏洞', '拒绝服务漏洞', '抢先交易漏洞', '重入漏洞', '时间操作漏洞', '未检查的低级调用漏洞'],
 	datasets: [
 		{
-			label: 'Securify',
-			data: [13.0, 0.0, 18.0, 53.0, 23.0, 24.0, 11.0]
+			label: 'Securify2',
+			data: [13.23, 11.25, 18.57, 54.67, 23.18, 24.83, 11.32]
 		},
 		{
-			label: 'Mythril',
-			data: [34.0, 73.0, 41.0, 63.0, 19.0, 23.0, 14.0]
+			label: 'smartcheck',
+			data: [20.34, 22.89, 15.73, 46.58, 21.92, 44.15, 11.43]
 		},
 		{
-			label: 'Slither',
-			data: [32.0, 0.0, 13.0, 26.0, 15.0, 44.0, 10.0]
+			label: 'ConFuzzius',
+			data: [15.87, 10.92, 9.28, 47.13, 26.71, 25.47, 7.29]
 		},
 		{
-			label: 'Manticore',
-			data: [30.0, 30.0, 12.0, 7.0, 9.0, 24.0, 4.0]
+			label: 'Conkas',
+			data: [19.45, 20.62, 16.73, 45.34, 20.89, 41.05, 10.63]
 		},
 		{
-			label: 'Smartcheck',
-			data: [20.0, 22.0, 52.0, 0.0, 22.0, 44.0, 11.0]
+			label: 'HoneyBadger',
+			data: [17.83, 12.68, 12.14, 42.82, 27.94, 26.43, 9.78]
 		},
 		{
-			label: 'Oyente',
-			data: [21.0, 71.0, 48.0, 0.0, 20.0, 24.0, 8.0]
+			label: 'Osiris',
+			data: [18.29, 24.37, 10.51, 44.36, 24.78, 42.53, 10.47]
 		},
 		{
-			label: '优化算法',
-			data: [81.98, 84.35, 82.09, 90.51, 86.40, 78.60, 84.81]
+			label: 'mythril',
+			data: [35.04, 34.73, 17.28, 41.36, 22.13, 26.82, 15.28]
+		},
+		{
+			label: '基于异构图的多级漏洞检测算法',
+			data: [81.98, 84.35, 82.09, 90.15, 86.07, 86.47, 84.81]
 		}
 	]
 };
@@ -78,38 +82,42 @@ const optionsBuggyF1 = {
 const optionsMacroF1 = {
 	type: 'bar',
 	title: {
-		text: '优化算法与传统算法比较 (Macro-F1)'
+		text: '基于异构图的多级漏洞检测算法(Macro F1)'
 	},
 	colorList: ["#3f51b5", "#009688", "#f44336", "#00bcd4", "#1ABC9C", "#FF9800", "#8BC34A", "#795548"],
 	labels: ['访问控制漏洞', '算术漏洞', '拒绝服务漏洞', '抢先交易漏洞', '重入漏洞', '时间操作漏洞', '未检查的低级调用漏洞'],
 	datasets: [
 		{
-			label: 'Securify',
-			data: [52.3, 45.2, 52.0, 72.2, 58.4, 52.4, 54.1]
+			label: 'Securify2',
+			data: [51.23, 52.46, 58.29, 71.36, 50.12, 52.41, 54.18]
 		},
 		{
-			label: 'Mythril',
-			data: [61.1, 84.1, 60.1, 77.8, 55.3, 50.8, 55.7]
+			label: 'smartcheck',
+			data: [56.17, 60.23, 45.39, 60.04, 48.23, 57.36, 52.29]
 		},
 		{
-			label: 'Slither',
-			data: [61.5, 45.2, 42.7, 56.9, 49.4, 57.3, 53.3]
+			label: 'ConFuzzius',
+			data: [53.12, 51.07, 52.48, 68.29, 53.54, 55.02, 48.72]
 		},
 		{
-			label: 'Manticore',
-			data: [61.1, 61.0, 48.0, 46.9, 51.2, 55.1, 50.6]
+			label: 'Conkas',
+			data: [54.39, 62.14, 55.68, 66.38, 51.74, 59.29, 49.08]
 		},
 		{
-			label: 'Smartcheck',
-			data: [56.0, 56.1, 69.9, 46.2, 57.8, 64.2, 54.1]
+			label: 'HoneyBadger',
+			data: [55.73, 53.28, 51.47, 63.42, 55.18, 57.15, 47.82]
 		},
 		{
-			label: 'Oyente',
-			data: [57.3, 82.8, 48.0, 0.0, 20.0, 52.4, 52.6]
+			label: 'Osiris',
+			data: [58.07, 64.52, 54.19, 65.11, 50.43, 58.26, 48.47]
 		},
 		{
-			label: '优化算法',
-			data: [79.23, 79.10, 77.84, 90.29, 86.76, 74.36, 86.74]
+			label: 'mythril',
+			data: [61.17, 73.48, 60.17, 77.83, 55.36, 50.81, 55.72]
+		},
+		{
+			label: '基于异构图的多级漏洞检测算法',
+			data: [79.23, 79.10, 77.84, 78.60, 80.78, 86.76, 86.74]
 		}
 	]
 };
@@ -118,7 +126,7 @@ const optionsMacroF1 = {
 const optionsBuggyF1graph = {
 	type: 'bar',
 	title: {
-		text: '其他图神经网络方法 vs 优化算法 (Buggy F1)'
+		text: '其他图神经网络方法 vs 基于异构图的多级漏洞检测算法 (Buggy F1)'
 	},
 	colorList: ["#3f51b5", "#009688", "#f44336", "#00bcd4", "#1ABC9C", "#FF9800"],
 	labels: ['访问控制漏洞', '算术漏洞', '拒绝服务漏洞', '抢先交易漏洞', '重入漏洞', '时间操作漏洞', '未检查的低级调用漏洞'],
@@ -140,7 +148,7 @@ const optionsBuggyF1graph = {
 			data: [62.63, 58.59, 56.41, 64.77, 58.29, 63.03, 61.69]
 		},
 		{
-			label: '优化算法',
+			label: '基于异构图的多级漏洞检测算法',
 			data: [89.15, 59.44, 87.71, 89.86, 71.04, 83.86, 73.38]
 		}
 	]
@@ -150,7 +158,7 @@ const optionsBuggyF1graph = {
 const optionsMacroF1graph = {
 	type: 'bar',
 	title: {
-		text: '其他图神经网络方法 vs 优化算法 (Macro-F1)'
+		text: '其他图神经网络方法 vs 基于异构图的多级漏洞检测算法 (Macro-F1)'
 	},
 	colorList: ["#3f51b5", "#009688", "#f44336", "#00bcd4", "#1ABC9C", "#FF9800"],
 	labels: ['访问控制漏洞', '算术漏洞', '拒绝服务漏洞', '抢先交易漏洞', '重入漏洞', '时间操作漏洞', '未检查的低级调用漏洞'],
@@ -172,7 +180,7 @@ const optionsMacroF1graph = {
 			data: [48.83, 50.80, 40.63, 46.08, 45.80, 46.78, 49.91]
 		},
 		{
-			label: '优化算法',
+			label: '基于异构图的多级漏洞检测算法',
 			data: [89.46, 66.16, 86.41, 88.66, 74.97, 86.05, 66.10]
 		}
 	]

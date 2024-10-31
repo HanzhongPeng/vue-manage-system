@@ -76,6 +76,8 @@ const projectInfo = ref({
 	createdAt: '',
 });
 
+
+
 // 格式化后的创建时间
 const formattedCreatedAt = ref('');
 
@@ -159,14 +161,21 @@ const exportReport = () => {
 
 // 扫描结果
 const scanHistory = ref([
-	{ fileName: 'main.py', strategy: '策略 X', date: '2024-10-01', vulnerabilities: 5 },
-	{ fileName: 'module1.js', strategy: '策略 Y', date: '2024-10-02', vulnerabilities: 2 },
-	{ fileName: 'app.java', strategy: '策略 Z', date: '2024-10-03', vulnerabilities: 1 },
+	{ fileName: 'timed_crowdsale.sol, governmental_survey.sol, roulette.sol,ether_lotto.sol', strategy: '全面策略-Securify2、smartcheck、mythril', date: '2024-10-01', vulnerabilities: 24 },
+	// { fileName: 'module1.js', strategy: '快速策略-Smartcheck', date: '2024-10-02', vulnerabilities: 2 },
+	// { fileName: 'app.java', strategy: '特定种类高精度策略-以太锁定-Securify2、ConFuzzius、smartcheck', date: '2024-10-03', vulnerabilities: 1 },
 ]);
 
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 // 查看扫描详情
 const viewScanDetails = (row) => {
 	console.log('查看扫描详情:', row);
+	router.push({
+		name: 'scanDetail',
+		params: { fileName: row.fileName }
+	});
 };
 
 // 初始化时获取项目和策略数据

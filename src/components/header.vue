@@ -3,7 +3,7 @@
         <!-- 折叠按钮 -->
         <div class="header-left">
             <img class="logo" src="../assets/img/logo.svg" alt="" />
-            <div class="web-title">智能合约漏洞检测系统</div>
+            <div class="web-title">H-Precision多策略智能合约漏洞检测平台</div>
             <div class="collapse-btn" @click="collapseChage">
                 <el-icon v-if="sidebar.collapse">
                     <Expand />
@@ -16,19 +16,19 @@
         <div class="header-right">
             <div class="header-user-con">
                 <div class="btn-icon" @click="router.push('/theme')">
-                    <el-tooltip effect="dark" content="设置主题" placement="bottom">
+                    <!-- <el-tooltip effect="dark" content="设置主题" placement="bottom">
                         <i class="el-icon-lx-skin"></i>
-                    </el-tooltip>
+                    </el-tooltip> -->
                 </div>
                 <div class="btn-icon" @click="router.push('/ucenter')">
-                    <el-tooltip
+                    <!-- <el-tooltip
                         effect="dark"
                         :content="message ? `有${message}条未读消息` : `消息中心`"
                         placement="bottom"
                     >
                         <i class="el-icon-lx-notice"></i>
-                    </el-tooltip>
-                    <span class="btn-bell-badge" v-if="message"></span>
+                    </el-tooltip> -->
+                    <!-- <span class="btn-bell-badge" v-if="message"></span> -->
                 </div>
                 <div class="btn-icon" @click="setFullScreen">
                     <el-tooltip effect="dark" content="全屏" placement="bottom">
@@ -47,13 +47,8 @@
                     </span>
                     <template #dropdown>
                         <el-dropdown-menu>
-                            <a href="https://github.com/lin-xin/vue-manage-system" target="_blank">
-                                <el-dropdown-item>项目仓库</el-dropdown-item>
-                            </a>
-                            <a href="https://lin-xin.gitee.io/example/vuems-doc/" target="_blank">
-                                <el-dropdown-item>官方文档</el-dropdown-item>
-                            </a>
-                            <el-dropdown-item command="user">个人中心</el-dropdown-item>
+                            
+                           
                             <el-dropdown-item divided command="loginout">退出登录</el-dropdown-item>
                         </el-dropdown-menu>
                     </template>

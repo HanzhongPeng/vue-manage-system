@@ -7,7 +7,7 @@
                         <!-- <ShoppingCartFull /> -->
                     <!-- </el-icon> -->
                     <div class="card-content">
-                        <countup class="card-num color4" :end="5" />
+                        <countup class="card-num color4" :end="3" />
                         <div>项目数量</div>
                     </div>
                 </el-card>
@@ -29,7 +29,7 @@
                         <ChatDotRound />
                     </el-icon> -->
                     <div class="card-content">
-                        <countup class="card-num color2" :end="3" />
+                        <countup class="card-num color2" :end="8" />
                         <div>策略数量</div>
                     </div>
                 </el-card>
@@ -40,7 +40,7 @@
                         <Goods />
                     </el-icon> -->
                     <div class="card-content">
-                        <countup class="card-num color3" :end="35" />
+                        <countup class="card-num color3" :end="223" />
                         <div>检测出的漏洞数量</div>
                     </div>
                 </el-card>
