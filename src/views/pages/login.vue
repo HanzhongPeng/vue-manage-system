@@ -36,7 +36,7 @@
                 <el-button class="login-btn" type="primary" size="large" @click="submitForm(login)">登录</el-button>
                 <p class="login-tips"></p>
                 <p class="login-text">
-                    没有账号？(默认用户名admin 密码admin)<el-link type="primary" @click="$router.push('/register')">立即注册</el-link>
+                    没有账号？<el-link type="primary" @click="$router.push('/register')">立即注册</el-link>
                 </p>
             </el-form>
         </div>
@@ -107,43 +107,44 @@ tabs.clearTabs();
 .login-bg {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     width: 100%;
     height: 100vh;
     background: url(../../assets/img/login-bg.jpg) center/cover no-repeat;
+    padding-left: 3%; /* 减少左侧空白区域，将登录框左移 */
+}
+
+.login-container {
+    width: 500px;
+    border-radius: 8px;
+    background: #fff;
+    padding: 50px 60px 60px;
+    box-sizing: border-box;
+    margin-left: 5%;
 }
 
 .login-header {
     display: flex;
     align-items: center;
-    justify-content: center;
     margin-bottom: 40px;
 }
 
 .logo {
-    width: 35px;
+    width: 50px;
 }
 
 .login-title {
-    font-size: 22px;
+    font-size: 24px;
     color: #333;
     font-weight: bold;
-}
-
-.login-container {
-    width: 450px;
-    border-radius: 5px;
-    background: #fff;
-    padding: 40px 50px 50px;
-    box-sizing: border-box;
 }
 
 .pwd-tips {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 14px;
-    margin: -10px 0 10px;
+    font-size: 16px;
+    margin: -10px 0 15px;
     color: #787878;
 }
 
@@ -154,18 +155,26 @@ tabs.clearTabs();
 .login-btn {
     display: block;
     width: 100%;
+    height: 45px;
+    font-size: 16px;
 }
 
 .login-tips {
-    font-size: 12px;
+    font-size: 18px;
     color: #999;
+    margin-top: 25px;
+    text-align: center;
 }
 
 .login-text {
     display: flex;
     align-items: center;
-    margin-top: 20px;
-    font-size: 14px;
+    margin-top: 25px;
+    font-size: 16px;
     color: #787878;
+    text-align: center;
+    justify-content: center;
 }
+
+
 </style>

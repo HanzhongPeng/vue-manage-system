@@ -83,7 +83,7 @@ const page = reactive({
 const getData = async () => {
 	try {
 		const res = await request({
-			url: 'http://localhost:8080/api/strategies',
+			url: 'http://26.142.76.59:8080/api/strategies',
 			method: 'GET',
 		});
 		if (res && res.status === 200 && Array.isArray(res.data)) {
@@ -141,7 +141,7 @@ const openDialog = (editMode, strategy = null) => {
 const createStrategy = async () => {
     try {
         const response = await request({
-            url: 'http://localhost:8080/api/strategies',
+            url: 'http://26.142.76.59:8080/api/strategies',
             method: 'POST',
             data: {
                 name: strategyData.value.name,
@@ -174,7 +174,7 @@ const updateStrategy = async () => {
         const currentStrategy = tableData.value.find(item => item.id === strategyData.value.id);
 
         const response = await request({
-            url: `http://localhost:8080/api/strategies/${strategyData.value.id}`,
+            url: `http://26.142.76.59:8080/api/strategies/${strategyData.value.id}`,
             method: 'PUT',
             data: {
                 id: strategyData.value.id,
@@ -226,7 +226,7 @@ const uploadData = reactive({
 
 const openUploadDialog = (strategy) => {
     currentStrategyId.value = strategy.id;
-    uploadUrl.value = `http://localhost:8080/api/strategies/${currentStrategyId.value}/upload`;
+    uploadUrl.value = `http://26.142.76.59:8080/api/strategies/${currentStrategyId.value}/upload`;
     uploadData.id = currentStrategyId.value;
     uploadVisible.value = true;
 };
@@ -276,7 +276,7 @@ const updateStrategyScript = async (fileName) => {
         const currentStrategy = tableData.value.find(item => item.id === currentStrategyId.value);
 
         const response = await request({
-            url: `http://localhost:8080/api/strategies/${currentStrategyId.value}`,
+            url: `http://26.142.76.59:8080/api/strategies/${currentStrategyId.value}`,
             method: 'PUT',
             data: {
                 id: currentStrategyId.value,
@@ -310,7 +310,7 @@ const closeUploadDialog = () => {
 const handleUploadSuccess = async (response, file) => {
 	try {
 		await request({
-			url: `http://localhost:8080/api/strategies/${currentStrategyId.value}`,
+			url: `http://26.142.76.59:8080/api/strategies/${currentStrategyId.value}`,
 			method: 'PUT',
 			data: {
 				script: file.name,
@@ -345,7 +345,7 @@ const handleUploadError = (error) => {
 const handleDelete = async (strategy) => {
 	try {
 		const response = await request({
-			url: `http://localhost:8080/api/strategies/${strategy.id}`,
+			url: `http://26.142.76.59:8080/api/strategies/${strategy.id}`,
 			method: 'DELETE',
 		});
 		if (response && response.status === 200) {

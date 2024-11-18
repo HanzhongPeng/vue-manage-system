@@ -23,7 +23,7 @@
   </template>
   
   <script setup lang="ts">
-  import { ref, onMounted, onUnmounted } from 'vue';
+  import { ref, onMounted } from 'vue';
   import * as echarts from 'echarts';
   
   // 矩形树图数据
@@ -124,6 +124,9 @@ const sixthBarChartInstance = ref(null);
 // 第一个矩形树图
 const initTreemap = () => {
   if (treemapContainer.value) {
+    if (treemapInstance.value) {
+      treemapInstance.value.dispose();
+    }
     treemapInstance.value = echarts.init(treemapContainer.value);
     treemapInstance.value.setOption({
       title: {
@@ -427,13 +430,37 @@ const initSixthBarChart = () => {
     initFifthBarChart();  // 新增的图表初始化
     initSixthBarChart();  // 新增的图表初始化
   });
+
+  import { onUnmounted } from 'vue';
+
+// 在所有实例初始化后，添加如下清理代码：
+onUnmounted(() => {
+  if (treemapInstance.value) {
+    treemapInstance.value.dispose();
+  }
+  if (barChartInstance.value) {
+    barChartInstance.value.dispose();
+  }
+  if (secondBarChartInstance.value) {
+    secondBarChartInstance.value.dispose();
+  }
+  if (thirdTreemapInstance.value) {
+    thirdTreemapInstance.value.dispose();
+  }
+  if (fourthBarChartInstance.value) {
+    fourthBarChartInstance.value.dispose();
+  }
+  if (fifthBarChartInstance.value) {
+    fifthBarChartInstance.value.dispose();
+  }
+  if (sixthBarChartInstance.value) {
+    sixthBarChartInstance.value.dispose();
+  }
+});
+
   
   // 销毁 ECharts 实例
-  onUnmounted(() => {
-    if (treemapInstance.value) treemapInstance.value.dispose();
-    if (barChartInstance.value) barChartInstance.value.dispose();
-    if (secondBarChartInstance.value) secondBarChartInstance.value.dispose();
-  });
+
   </script>
   
   <style scoped>

@@ -88,7 +88,7 @@ const page = reactive({
 const getData = async () => {
   try {
     const response = await request({
-      url: `http://localhost:8080/api/projects`,
+      url: `http://26.142.76.59:8080/api/projects`,
       method: 'GET'
     });
 
@@ -173,7 +173,7 @@ const authenticate = async () => {
 
 	try {
 		const response = await request({
-			url: 'http://localhost:8080/api/auth/login', // 认证接口 URL
+			url: 'http://26.142.76.59:8080/api/auth/login', // 认证接口 URL
 			method: 'POST',
 			data: credentials
 		});
@@ -204,7 +204,7 @@ const saveProject = async () => {
     if (isEdit.value) {
       // 编辑项目
       const response = await request({
-        url: `http://localhost:8080/api/projects/${projectData.id}`,
+        url: `http://26.142.76.59:8080/api/projects/${projectData.id}`,
         method: 'PUT',
         data: projectData
       });
@@ -229,7 +229,7 @@ const saveProject = async () => {
       };
 
       const response = await request({
-        url: 'http://localhost:8080/api/projects',
+        url: 'http://26.142.76.59:8080/api/projects',
         method: 'POST',
         data: newProject
       });
@@ -260,7 +260,7 @@ const closeDialog = () => {
 const handleDelete = async (row) => {
   try {
     const response = await request({
-      url: `http://localhost:8080/api/projects/${row.id}`,
+      url: `http://26.142.76.59:8080/api/projects/${row.id}`,
       method: 'DELETE'
     });
 
