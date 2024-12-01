@@ -25,6 +25,9 @@
   <script setup lang="ts">
   import { ref, onMounted } from 'vue';
   import * as echarts from 'echarts';
+  // import { onBeforeRouteLeave } from 'vue-router';
+  
+  
   
   // 矩形树图数据
   const treemapData = [
@@ -156,6 +159,17 @@ const initTreemap = () => {
   }
 };
   
+const instances = [
+  treemapInstance,
+  barChartInstance,
+  secondBarChartInstance,
+  thirdTreemapInstance,
+  fourthBarChartInstance,
+  fifthBarChartInstance,
+  sixthBarChartInstance,
+];
+
+
   // 初始化第一个柱状图
   const initBarChart = () => {
     if (barChartContainer.value) {
@@ -419,44 +433,39 @@ const initSixthBarChart = () => {
     });
   }
 };
+
+
+
   
   // 在组件挂载后初始化图表
   onMounted(() => {
-    initTreemap();
-    initBarChart();
-    initSecondBarChart();
-    initThirdTreemap();  // 新增的图表初始化
-    initFourthBarChart();  // 新增的图表初始化
-    initFifthBarChart();  // 新增的图表初始化
-    initSixthBarChart();  // 新增的图表初始化
-  });
+  initTreemap();
+  initBarChart();
+  initSecondBarChart();
+  initThirdTreemap();
+  initFourthBarChart();
+  initFifthBarChart();
+  initSixthBarChart();
+});
+  // import { onUnmounted } from 'vue';
 
-  import { onUnmounted } from 'vue';
+//   const disposeInstance = (instance) => {
+//   if (instance?.value) {
+//     instance.value.dispose();
+//     instance.value = null;
+//   }
+// };
 
 // 在所有实例初始化后，添加如下清理代码：
-onUnmounted(() => {
-  if (treemapInstance.value) {
-    treemapInstance.value.dispose();
-  }
-  if (barChartInstance.value) {
-    barChartInstance.value.dispose();
-  }
-  if (secondBarChartInstance.value) {
-    secondBarChartInstance.value.dispose();
-  }
-  if (thirdTreemapInstance.value) {
-    thirdTreemapInstance.value.dispose();
-  }
-  if (fourthBarChartInstance.value) {
-    fourthBarChartInstance.value.dispose();
-  }
-  if (fifthBarChartInstance.value) {
-    fifthBarChartInstance.value.dispose();
-  }
-  if (sixthBarChartInstance.value) {
-    sixthBarChartInstance.value.dispose();
-  }
-});
+// onUnmounted(() => {
+//   disposeInstance(treemapInstance);
+//   disposeInstance(barChartInstance);
+//   disposeInstance(secondBarChartInstance);
+//   disposeInstance(thirdTreemapInstance);
+//   disposeInstance(fourthBarChartInstance);
+//   disposeInstance(fifthBarChartInstance);
+//   disposeInstance(sixthBarChartInstance);
+// });
 
   
   // 销毁 ECharts 实例

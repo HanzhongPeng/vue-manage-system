@@ -169,6 +169,7 @@ export const menuData: Menus[] = [
         icon: 'Brush',
         index: '/project',
         title: '项目管理',
+        permiss: '6',
     },
     {
         id: '4',
@@ -233,6 +234,7 @@ export const menuData: Menus[] = [
         icon: 'Calendar',
         index: '/result',
         title: '策略结果展示',
+        permiss: '6',
     },
 
     // {

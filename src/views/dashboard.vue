@@ -3,11 +3,8 @@
         <el-row :gutter="20" class="mgb20">            
             <el-col :span="6">
                 <el-card shadow="hover" body-class="card-body">
-                    <!-- <el-icon class="card-icon bg4"> -->
-                        <!-- <ShoppingCartFull /> -->
-                    <!-- </el-icon> -->
                     <div class="card-content">
-                        <countup class="card-num color4" :end="3" />
+                        <countup class="card-num color4" :end="projectCount" />
                         <div>项目数量</div>
                     </div>
                 </el-card>
@@ -25,22 +22,16 @@
             </el-col>
             <el-col :span="6">
                 <el-card shadow="hover" body-class="card-body">
-                    <!-- <el-icon class="card-icon bg2">
-                        <ChatDotRound />
-                    </el-icon> -->
                     <div class="card-content">
-                        <countup class="card-num color2" :end="8" />
+                        <countup class="card-num color1" :end="strategyCount" />
                         <div>策略数量</div>
                     </div>
                 </el-card>
             </el-col>
             <el-col :span="6">
                 <el-card shadow="hover" body-class="card-body">
-                    <!-- <el-icon class="card-icon bg3">
-                        <Goods />
-                    </el-icon> -->
                     <div class="card-content">
-                        <countup class="card-num color3" :end="223" />
+                        <countup class="card-num color3" :end="totalVulnerabilities" />
                         <div>检测出的漏洞数量</div>
                     </div>
                 </el-card>
@@ -140,8 +131,10 @@ import {
 } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import VChart from 'vue-echarts';
-import { dashOpt1, dashOpt2, mapOptions } from './chart/options';
+import { dashOpt1, mapOptions } from './chart/options';
 import chinaMap from '@/utils/china';
+import { ref, onMounted,watch } from 'vue';
+import request from '@/utils/request';
 use([
     CanvasRenderer,
     BarChart,
@@ -155,6 +148,123 @@ use([
     MapChart,
 ]);
 registerMap('china', chinaMap);
+
+const strategyCount = ref(0); // 定义策略数量的响应式变量
+
+const vulnerabilities = ref([]); // 存储漏洞数据
+const totalVulnerabilities = ref(0); // 总漏洞数量
+
+// 漏洞种类分布数据，用于动态更新图表
+const vulnerabilitiesDistribution = ref([]);
+
+// 获取漏洞数据的函数
+const fetchVulnerabilities = async () => {
+    try {
+        const response = await request({
+            url: 'http://26.142.76.59:8080/api/vulnerabilities',
+            method: 'GET',
+        });
+
+        if (response.status === 200 && Array.isArray(response.data)) {
+            vulnerabilities.value = response.data;
+
+            // 统计漏洞总数
+            totalVulnerabilities.value = vulnerabilities.value.reduce((sum, vuln) => {
+                return sum + (vuln.count || 0); // 确保count存在
+            }, 0);
+            console.log(response.data)
+
+            // 更新漏洞种类分布数据
+            vulnerabilitiesDistribution.value = vulnerabilities.value.map(vuln => ({
+                name: vuln.name,
+                value: vuln.count,
+            }));
+        } else {
+            console.error('获取漏洞数据失败，数据格式不正确');
+        }
+    } catch (error) {
+        console.error('获取漏洞数据失败：', error);
+    }
+};
+
+
+
+
+
+// 获取策略数量的函数
+const fetchStrategyCount = async () => {
+    try {
+        const response = await request({
+            url: 'http://26.142.76.59:8080/api/strategies',
+            method: 'GET',
+        });
+
+        // 检查响应数据
+        if (response && response.status === 200 && Array.isArray(response.data)) {
+            strategyCount.value = response.data.length; // 更新策略总数
+        } else {
+            console.error('获取策略列表失败，数据格式不正确');
+        }
+    } catch (error) {
+        console.error('获取策略数据失败：', error);
+    }
+};
+
+const summaryData = {
+    "过时的编译器版本": 2,
+    "违反代币标准": 1,
+    "具有区块 Gas 限制的 DoS": 1,
+    "意外的以太币余额": 1,
+    "不安全的类型转换": 1,
+    "使用已弃用的 Solidity 函数": 1,
+    "函数默认可见性": 1,
+};
+
+
+
+const uploadVulnerabilitySummary = async (summary) => {
+    try {
+        const uploadPromises = Object.entries(summary).map(async ([name, count]) => {
+            if (!Number.isInteger(count) || count <= 0) {
+                console.warn(`跳过无效的数量：${count}，漏洞名称："${name}"`);
+                return;
+            }
+
+            // 构造请求 URL
+            const url = `http://26.142.76.59:8080/api/vulnerabilities/increase/${name}`;
+            console.log("发送请求 URL:", url);
+            console.log("发送请求 body:", { count });
+
+            // 发送 POST 请求
+            const response = await request({
+                url,
+                method: 'POST',
+                data: { count }, // 上传数量
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            // 检查响应状态
+            if (response.status === 200) {
+                console.log(`漏洞 "${name}" 数量增加成功`);
+            } else {
+                console.error(`漏洞 "${name}" 上传失败：`, response.data);
+            }
+        });
+
+        await Promise.all(uploadPromises);
+        console.log("所有漏洞总结已上传到后端");
+    } catch (error) {
+        console.error("上传漏洞总结失败：", error);
+    }
+};
+
+
+
+
+uploadVulnerabilitySummary(summaryData);
+
 const activities = [
     {
         content: '收藏商品',
@@ -187,6 +297,123 @@ const activities = [
         color: '#009688',
     },
 ];
+
+
+// 定义项目总数的响应式变量
+const projectCount = ref(0);
+
+// 获取项目总数的函数
+const fetchProjectCount = async () => {
+    try {
+        const response = await request({
+            url: `http://26.142.76.59:8080/api/projects`,
+            method: 'GET',
+        });
+
+        // 检查响应数据
+        if (response && response.status === 200 && Array.isArray(response.data)) {
+            projectCount.value = response.data.length; // 更新项目总数
+        } else {
+            console.error('获取项目总数失败，数据格式不正确');
+        }
+    } catch (error) {
+        console.error('获取项目数据失败：', error);
+    }
+};
+
+// 在组件挂载时调用获取项目总数的函数
+onMounted(() => {
+    fetchProjectCount();
+    fetchStrategyCount();
+    fetchVulnerabilities();
+});
+
+// 初始的漏洞种类分布图表配置
+const dashOpt2 = ref({
+    title: {
+        text: '漏洞种类分布',
+        left: 'center',
+    },
+    tooltip: {
+        trigger: 'item',
+    },
+    legend: {
+        orient: 'vertical',
+        left: 'left',
+    },
+    series: [
+        {
+            name: '漏洞种类',
+            type: 'pie',
+            radius: '50%',
+            data: [],
+            emphasis: {
+                itemStyle: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)',
+                },
+            },
+        },
+    ],
+});
+
+// 动态更新图表数据
+watch(vulnerabilitiesDistribution, (newData) => {
+    // 过滤掉 value 为 0 的数据
+    const filteredData = newData.filter(item => item.value > 0);
+
+    if (filteredData.length === 0) {
+        // 如果过滤后没有数据，显示“暂无漏洞数据”
+        dashOpt2.value = {
+            title: {
+                text: '暂无漏洞数据',
+                left: 'center',
+                textStyle: { color: '#999', fontSize: 16 },
+            },
+            tooltip: { show: false },
+            legend: { show: false },
+            series: [
+                {
+                    type: 'pie',
+                    radius: '50%',
+                    data: [{ name: '无数据', value: 0 }],
+                    label: { show: false },
+                },
+            ],
+        };
+    } else {
+        // 正常显示过滤后的数据
+        dashOpt2.value = {
+            title: {
+                text: '漏洞种类分布',
+                left: 'center',
+            },
+            tooltip: {
+                trigger: 'item',
+            },
+            legend: {
+                orient: 'vertical',
+                left: 'left',
+            },
+            series: [
+                {
+                    name: '漏洞种类',
+                    type: 'pie',
+                    radius: '50%',
+                    data: filteredData, // 使用过滤后的数据
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)',
+                        },
+                    },
+                },
+            ],
+        };
+    }
+});
 
 const ranks = [
     {

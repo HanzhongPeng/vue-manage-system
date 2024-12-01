@@ -140,7 +140,7 @@ const routes: RouteRecordRaw[] = [
                 path: '/strategy',
                 name: 'strategy',
                 meta: {
-                    title: '策略配置',
+                    title: '策略管理',
                 },
                 component: () => import(/* webpackChunkName: "ucenter" */ '../views/strategy.vue'),
             },

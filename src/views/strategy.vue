@@ -1,6 +1,6 @@
 <template>
 	<div class="strategy-config-container">
-		<h1 class="page-title">策略配置</h1>
+		<h1 class="page-title">策略管理</h1>
 
 		<!-- 新增策略按钮 -->
 		<el-button type="primary" @click="openDialog(false)">新增策略</el-button>
