@@ -202,7 +202,7 @@ const routes: RouteRecordRaw[] = [
                 name: 'projectDetail',
                 meta: {
                   title: '项目详情',
-                  permiss: '7',
+                  permiss: '24',
                 },
                 component: () => import(/* webpackChunkName: "theme" */ '../views/project-detail.vue'),
                 props: true

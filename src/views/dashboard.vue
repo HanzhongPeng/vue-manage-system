@@ -131,10 +131,11 @@ import {
 } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import VChart from 'vue-echarts';
-import { dashOpt1, mapOptions } from './chart/options';
+import {  mapOptions } from './chart/options';
 import chinaMap from '@/utils/china';
 import { ref, onMounted,watch } from 'vue';
 import request from '@/utils/request';
+
 use([
     CanvasRenderer,
     BarChart,
@@ -210,60 +211,25 @@ const fetchStrategyCount = async () => {
     }
 };
 
-const summaryData = {
-    "过时的编译器版本": 2,
-    "违反代币标准": 1,
-    "具有区块 Gas 限制的 DoS": 1,
-    "意外的以太币余额": 1,
-    "不安全的类型转换": 1,
-    "使用已弃用的 Solidity 函数": 1,
-    "函数默认可见性": 1,
-};
-
-
-
-const uploadVulnerabilitySummary = async (summary) => {
-    try {
-        const uploadPromises = Object.entries(summary).map(async ([name, count]) => {
-            if (!Number.isInteger(count) || count <= 0) {
-                console.warn(`跳过无效的数量：${count}，漏洞名称："${name}"`);
-                return;
-            }
-
-            // 构造请求 URL
-            const url = `http://26.142.76.59:8080/api/vulnerabilities/increase/${name}`;
-            console.log("发送请求 URL:", url);
-            console.log("发送请求 body:", { count });
-
-            // 发送 POST 请求
-            const response = await request({
-                url,
-                method: 'POST',
-                data: { count }, // 上传数量
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            // 检查响应状态
-            if (response.status === 200) {
-                console.log(`漏洞 "${name}" 数量增加成功`);
-            } else {
-                console.error(`漏洞 "${name}" 上传失败：`, response.data);
-            }
-        });
-
-        await Promise.all(uploadPromises);
-        console.log("所有漏洞总结已上传到后端");
-    } catch (error) {
-        console.error("上传漏洞总结失败：", error);
-    }
-};
+// const summaryData = {
+//     "过时的编译器版本": 2,
+//     "违反代币标准": 1,
+//     "具有区块 Gas 限制的 DoS": 1,
+//     "意外的以太币余额": 1,
+//     "不安全的类型转换": 1,
+//     "使用已弃用的 Solidity 函数": 1,
+//     "函数默认可见性": 1,
+// };
 
 
 
 
-uploadVulnerabilitySummary(summaryData);
+
+
+
+
+
+// uploadVulnerabilitySummary(summaryData);
 
 const activities = [
     {
@@ -299,6 +265,159 @@ const activities = [
 ];
 
 
+const dashOpt1 = ref({}); // echarts 图表配置
+
+const fetchWeeklyVulnerabilities = async () => {
+  const dailyVulnerabilities = [];
+  const projects = [];
+  const allExecutions = [];
+  const executionResults = [];
+
+  try {
+    console.log("开始获取项目列表...");
+    const projectResponse = await request({
+      url: 'http://26.142.76.59:8080/api/projects',
+      method: 'GET',
+    });
+    if (projectResponse?.status === 200) {
+      projects.push(...projectResponse.data);
+      console.log("成功获取项目列表:", projects);
+    } else {
+      console.warn("获取项目列表失败，响应不成功:", projectResponse?.status);
+    }
+
+    console.log("开始获取每个项目的执行记录...");
+    const executionPromises = projects.map(async (project) => {
+      try {
+        console.log(`获取项目 ${project.id} 的执行记录...`);
+        const execResponse = await request({
+          url: `http://26.142.76.59:8080/api/executions/project/${project.id}`,
+          method: 'GET',
+        });
+        if (execResponse?.status === 200) {
+          allExecutions.push(...execResponse.data);
+          console.log(`项目 ${project.id} 执行记录:`, execResponse.data);
+        } else {
+          console.warn(`项目 ${project.id} 获取执行记录失败，响应不成功:`, execResponse?.status);
+        }
+      } catch (error) {
+        console.error(`项目 ${project.id} 获取执行记录失败:`, error.message);
+      }
+    });
+    await Promise.allSettled(executionPromises);
+
+    console.log("开始获取每个执行记录的输出...");
+    const outputPromises = allExecutions.map(async (execution) => {
+      try {
+        console.log(`获取执行记录 ${execution.id} 的输出文件...`);
+        const outputResponse = await request({
+          url: `http://26.142.76.59:8080/api/executions/${execution.id}/output`,
+          method: 'GET',
+          responseType: 'text',
+        });
+
+        if (outputResponse?.status === 200) {
+          const outputContent = outputResponse.data || '';
+          const [_, summaryPart] = outputContent.split(/}\s+漏洞总结：/);
+
+          console.log(`执行记录 ${execution.id} 的漏洞总结:`, summaryPart);
+
+          const summaryDetails = {};
+          const regex = /漏洞类型：(.+?)；漏洞个数：(\d+)/g;
+          let match;
+          while ((match = regex.exec(summaryPart?.trim() || '')) !== null) {
+            const [_, type, count] = match;
+            summaryDetails[type] = parseInt(count, 10);
+          }
+
+          const totalVulnerabilities = Object.values(summaryDetails).reduce(
+            (sum, count) => sum + count,
+            0
+          );
+
+          const date = execution.end_time.split('T')[0];
+          console.log(`执行记录 ${execution.id} 日期: ${date}, 总漏洞数: ${totalVulnerabilities}`);
+
+          executionResults.push({
+            date,
+            count: totalVulnerabilities,
+          });
+        } else {
+          console.warn(`执行记录 ${execution.id} 的输出文件未找到 (404)，跳过`);
+        }
+      } catch (error) {
+        console.warn(`执行记录 ${execution.id} 获取输出失败，跳过:`, error.message);
+      }
+    });
+    await Promise.allSettled(outputPromises);
+
+    console.log("开始统计每日漏洞总数...");
+    const lastSevenDays = getLastSevenDays();
+    console.log("最近七天日期:", lastSevenDays);
+    const dailyCount = Object.fromEntries(lastSevenDays.map((date) => [date, 0]));
+
+    executionResults.forEach(({ date, count }) => {
+      if (date in dailyCount) {
+        dailyCount[date] += count;
+      }
+    });
+
+    console.log("每日漏洞总数统计结果:", dailyCount);
+
+    dailyVulnerabilities.push(
+      ...lastSevenDays.map((date) => ({
+        date,
+        count: dailyCount[date],
+      }))
+    );
+
+    console.log("最终的每日漏洞总数数组:", dailyVulnerabilities);
+
+    dashOpt1.value = {
+      title: {
+        text: '最近一周漏洞检测动态',
+        left: 'center',
+      },
+      tooltip: {
+        trigger: 'axis',
+      },
+      xAxis: {
+        type: 'category',
+        data: dailyVulnerabilities.map((item) => item.date),
+      },
+      yAxis: {
+        type: 'value',
+        name: '漏洞总数',
+      },
+      series: [
+        {
+          name: '漏洞总数',
+          type: 'line',
+          data: dailyVulnerabilities.map((item) => item.count),
+        },
+      ],
+    };
+    console.log("ECharts 配置已更新:", dashOpt1.value);
+  } catch (error) {
+    console.error("获取漏洞检测动态失败:", error.message);
+  }
+};
+
+
+
+
+const getLastSevenDays = () => {
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    days.push(date.toISOString().split('T')[0]);
+  }
+  return days;
+};
+
+
+
 // 定义项目总数的响应式变量
 const projectCount = ref(0);
 
@@ -326,6 +445,7 @@ onMounted(() => {
     fetchProjectCount();
     fetchStrategyCount();
     fetchVulnerabilities();
+    fetchWeeklyVulnerabilities();
 });
 
 // 初始的漏洞种类分布图表配置

@@ -40,7 +40,7 @@
                     </el-sub-menu>
                 </template>
                 <template v-else>
-                    <el-menu-item :index="item.index" :key="item.index" v-permiss="item.id">
+                    <el-menu-item :index="item.index" :key="item.index" v-permiss="item.id" @click="handleMenuClick(item.index)">
                         <el-icon>
                             <component :is="item.icon"></component>
                         </el-icon>
@@ -62,6 +62,13 @@ const route = useRoute();
 const onRoutes = computed(() => {
     return route.path;
 });
+import { useRouter } from 'vue-router';
+const router = useRouter();
+const handleMenuClick = (route) => {
+  router.push(route).then(() => {
+    router.go(0); // 强制重新加载当前路由的组件
+  });
+};
 
 const sidebar = useSidebarStore();
 </script>

@@ -538,18 +538,32 @@ const getExecutionRecords = async () => {
         if (response?.status === 200) {
             const records = response.data;
 
-            records.forEach((record) => {
-                const prevStatus = lastStatuses.get(record.id);
+            records.forEach(async (record) => {
+    const prevStatus = lastStatuses.get(record.id);
+    console.log(`任务ID: ${record.id}, 之前状态: ${prevStatus || '未记录'}, 当前状态: ${record.status}`);
 
-                // 检查状态是否变为 completed
-                if (prevStatus !== record.status && record.status === 'completed') {
-                    console.log(`扫描完成：任务ID ${record.id}`);
-                    sendVulnerabilitiesToBackend(); // 自动发送漏洞总结
-                }
+    // 判断状态从 "扫描中" 变为 "扫描成功"
+    if (prevStatus === 'running' && record.status === 'completed') {
+        console.log(`任务状态从 '扫描中' 变为 '扫描成功'：任务ID ${record.id}`);
+        
+        // 在调用 sendVulnerabilitiesToBackend 之前，先解析任务输出
+        try {
+            await getExecutionOutput(record.id); // 获取并解析任务输出
+            if (parsedOutput.value) {
+                await sendVulnerabilitiesToBackend(record.id); // 自动发送漏洞总结
+            } else {
+                console.warn(`任务 ${record.id} 的解析结果为空，跳过发送漏洞总结`);
+            }
+        } catch (error) {
+            console.error(`任务 ${record.id} 的输出处理失败：`, error.message);
+        }
+    }
 
-                // 更新状态
-                lastStatuses.set(record.id, record.status);
-            });
+    // 更新状态
+    console.log(`更新任务状态：任务ID ${record.id}, 新状态: ${record.status}`);
+    lastStatuses.set(record.id, record.status);
+});
+
 
             // 更新执行记录表格
             executionRecords.value = await Promise.all(
@@ -585,33 +599,62 @@ const getExecutionRecords = async () => {
 };
 
 
-const sendVulnerabilitiesToBackend = async () => {
-    if (!parsedOutput.value || !parsedOutput.value.summary) {
-        console.warn("漏洞总结为空，无法发送到后端");
+const sendVulnerabilitiesToBackend = async (executionId) => {
+    console.log("开始发送漏洞总结到后端，任务ID:", executionId);
+
+    // 调用 getExecutionOutput 获取并解析数据
+    await getExecutionOutput(executionId);
+
+    // 检查 parsedOutput 和 summary 是否存在
+    if (!parsedOutput.value) {
+        console.warn(`任务ID ${executionId}: parsedOutput.value 为空`);
+        return;
+    }
+    if (!parsedOutput.value.summary) {
+        console.warn(`任务ID ${executionId}: parsedOutput.value.summary 为空`);
         return;
     }
 
     const summary = parsedOutput.value.summary;
 
-    const promises = Object.entries(summary).map(async ([name, count]) => {
-        try {
-            await request({
-                url: `/vulnerabilities/increase/${encodeURIComponent(name)}`,
+    console.log(`任务ID ${executionId}: 解析到的漏洞总结内容:`, summary);
+
+    try {
+        // 使用 Promise.all 批量发送漏洞数据
+        const promises = Object.entries(summary).map(([type, count]) => {
+            if (!type || !Number.isInteger(count) || count <= 0) {
+                console.warn(`任务ID ${executionId}: 跳过无效漏洞数据: 类型="${type}"，数量="${count}"`);
+                return Promise.resolve();
+            }
+
+            console.log(`任务ID ${executionId}: 准备发送漏洞 "${type}"，数量: ${count}`);
+            return request({
+                url: `http://26.142.76.59:8080/vulnerabilities/increase`, // 不将类型放在路径中
                 method: 'POST',
-                data: { count },
+                data: { type, count }, // 将漏洞类型和数量通过 JSON 传递
                 headers: {
                     'Content-Type': 'application/json',
                 },
-            });
-            console.log(`漏洞 "${name}" 数量增加成功`);
-        } catch (error) {
-            console.error(`发送漏洞 "${name}" 数据失败：`, error);
-        }
-    });
+            })
+                .then(() => {
+                    console.log(`任务ID ${executionId}: 漏洞 "${type}" 数量增加成功`);
+                })
+                .catch((error) => {
+                    console.error(
+                        `任务ID ${executionId}: 发送漏洞 "${type}" 数据失败:`,
+                        error?.response || error
+                    );
+                });
+        });
 
-    await Promise.all(promises);
-    console.log("漏洞总结已发送到后端");
+        // 等待所有请求完成
+        await Promise.all(promises);
+        console.log(`任务ID ${executionId}: 所有漏洞数据已成功发送到后端`);
+    } catch (error) {
+        console.error(`任务ID ${executionId}: 发送漏洞总结到后端失败:`, error);
+    }
 };
+
 
 
 
@@ -822,7 +865,7 @@ onMounted(() => {
 
     refreshInterval = setInterval(() => {
         getExecutionRecords();
-    }, 1000); // 10秒刷新一次
+    }, 5000); // 10秒刷新一次
 });
 
 onBeforeUnmount(() => {
