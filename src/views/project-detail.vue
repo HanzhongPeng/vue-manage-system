@@ -60,7 +60,7 @@
 		<!-- 操作按钮 -->
 		<div class="buttons">
 			<el-button type="primary" @click="startScan">开始扫描</el-button>
-			<el-button type="success" @click="exportReport">导出报告</el-button>
+			<!-- <el-button type="success" @click="exportReport">导出报告</el-button> -->
 		</div>
 
 		<!-- 扫描结果 -->
@@ -157,6 +157,7 @@
     </template>
     <span slot="footer" class="dialog-footer">
         <el-button @click="() => (showModal = false)">关闭</el-button>
+        
     </span>
 </el-dialog>
 
@@ -620,39 +621,45 @@ const sendVulnerabilitiesToBackend = async (executionId) => {
     console.log(`任务ID ${executionId}: 解析到的漏洞总结内容:`, summary);
 
     try {
-        // 使用 Promise.all 批量发送漏洞数据
-        const promises = Object.entries(summary).map(([type, count]) => {
-            if (!type || !Number.isInteger(count) || count <= 0) {
-                console.warn(`任务ID ${executionId}: 跳过无效漏洞数据: 类型="${type}"，数量="${count}"`);
-                return Promise.resolve();
-            }
+    // 使用 Promise.all 批量发送漏洞数据
+    const promises = Object.entries(summary).map(([type, count]) => {
+        if (!type || !Number.isInteger(count) || count <= 0) {
+            console.warn(`任务ID ${executionId}: 跳过无效漏洞数据: 类型="${type}"，数量="${count}"`);
+            return Promise.resolve();
+        }
 
-            console.log(`任务ID ${executionId}: 准备发送漏洞 "${type}"，数量: ${count}`);
-            return request({
-                url: `http://26.142.76.59:8080/vulnerabilities/increase`, // 不将类型放在路径中
-                method: 'POST',
-                data: { type, count }, // 将漏洞类型和数量通过 JSON 传递
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+        console.log(`任务ID ${executionId}: 准备发送漏洞 "${type}"，数量: ${count}`);
+
+        // 将 type 放在 URL 路径中
+        const encodedType = encodeURIComponent(type);
+        const url = `http://26.142.76.59:8080/api/vulnerabilities/increase/${encodedType}`;
+
+        return request({
+            url,
+            method: 'POST',
+            data: count, // 直接发送数字
+            headers: {
+                'Content-Type': 'application/json', // 可选，根据后端接受的数据类型调整
+            },
+        })
+            .then(() => {
+                console.log(`任务ID ${executionId}: 漏洞 "${type}" 数量增加成功`);
             })
-                .then(() => {
-                    console.log(`任务ID ${executionId}: 漏洞 "${type}" 数量增加成功`);
-                })
-                .catch((error) => {
-                    console.error(
-                        `任务ID ${executionId}: 发送漏洞 "${type}" 数据失败:`,
-                        error?.response || error
-                    );
-                });
-        });
+            .catch((error) => {
+                console.error(
+                    `任务ID ${executionId}: 发送漏洞 "${type}" 数据失败:`,
+                    error?.response || error
+                );
+            });
+    });
 
-        // 等待所有请求完成
-        await Promise.all(promises);
-        console.log(`任务ID ${executionId}: 所有漏洞数据已成功发送到后端`);
-    } catch (error) {
-        console.error(`任务ID ${executionId}: 发送漏洞总结到后端失败:`, error);
-    }
+    // 等待所有请求完成
+    await Promise.all(promises);
+    console.log(`任务ID ${executionId}: 所有漏洞数据已成功发送到后端`);
+} catch (error) {
+    console.error(`任务ID ${executionId}: 发送漏洞总结到后端失败:`, error);
+}
+
 };
 
 
