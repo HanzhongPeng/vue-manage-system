@@ -175,6 +175,7 @@ import { ref, onMounted , onBeforeUnmount} from 'vue';
 import { useRoute } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import request from '@/utils/request';
+import { useRouter } from 'vue-router';
 
 // 路由参数和项目信息
 const route = useRoute();
@@ -623,7 +624,7 @@ const sendVulnerabilitiesToBackend = async (executionId) => {
     try {
     // 使用 Promise.all 批量发送漏洞数据
     const promises = Object.entries(summary).map(([type, count]) => {
-        if (!type || !Number.isInteger(count) || count <= 0) {
+        if (!type || !Number.isInteger(count)) {
             console.warn(`任务ID ${executionId}: 跳过无效漏洞数据: 类型="${type}"，数量="${count}"`);
             return Promise.resolve();
         }
@@ -827,7 +828,7 @@ const scanHistory = ref([
 	// { fileName: 'app.java', strategy: '特定种类高精度策略-以太锁定-Securify2、ConFuzzius、smartcheck', date: '2024-10-03', vulnerabilities: 1 },
 ]);
 
-import { useRouter } from 'vue-router';
+
 
 const router = useRouter();
 // 查看扫描详情

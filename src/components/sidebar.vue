@@ -57,12 +57,13 @@ import { computed } from 'vue';
 import { useSidebarStore } from '../store/sidebar';
 import { useRoute } from 'vue-router';
 import { menuData } from '@/components/menu';
+import { useRouter } from 'vue-router';
 
 const route = useRoute();
 const onRoutes = computed(() => {
     return route.path;
 });
-import { useRouter } from 'vue-router';
+
 const router = useRouter();
 const handleMenuClick = (route) => {
   router.push(route).then(() => {
