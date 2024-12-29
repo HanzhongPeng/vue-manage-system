@@ -229,13 +229,13 @@ export const menuData: Menus[] = [
         title: '策略管理',
         permiss: '6',
     },
-    {
-        id: '3',
-        icon: 'Calendar',
-        index: '/result',
-        title: '策略结果展示',
-        permiss: '6',
-    },
+    // {
+    //     id: '3',
+    //     icon: 'Calendar',
+    //     index: '/result',
+    //     title: '策略结果展示',
+    //     permiss: '6',
+    // },
 
     // {
     //     id: '6',

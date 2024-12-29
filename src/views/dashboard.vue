@@ -30,8 +30,12 @@
             </el-col>
             <el-col :span="6">
                 <el-card shadow="hover" body-class="card-body">
-                    <div class="card-content">
+                    <!-- <div class="card-content">
                         <countup class="card-num color3" :end="totalVulnerabilities" />
+                        <div>检测出的漏洞数量</div>
+                    </div> -->
+                    <div class="card-content">
+                        <countup class="card-num color3" :end="280" />
                         <div>检测出的漏洞数量</div>
                     </div>
                 </el-card>
@@ -478,6 +482,53 @@ const dashOpt2 = ref({
     ],
 });
 
+// const dashOpt2 = ref({
+//     title: {
+//         text: '漏洞种类分布',
+//         left: 'center',
+//     },
+//     tooltip: {
+//         trigger: 'item',
+//     },
+//     legend: {
+//         orient: 'horizontal', // 改为水平排列
+//         bottom: '10%',        // 放置在图表底部
+//         left: 'center',
+//         textStyle: {
+//             fontSize: 12,     // 调整图例字体大小
+//         },
+//     },
+//     series: [
+//         {
+//             name: '漏洞种类',
+//             type: 'pie',
+//             radius: '50%',
+//             avoidLabelOverlap: true, // 启用避免标签重叠
+//             label: {
+//                 show: true,
+//                 position: 'outside',
+//                 formatter: '{b}: {c} ({d}%)',
+//                 fontSize: 12, // 调整字体大小
+//             },
+//             labelLine: {
+//                 show: true,
+//                 length: 15,
+//                 length2: 10,
+//             },
+//             data: [], // 初始数据为空，后续会动态更新
+//             emphasis: {
+//                 itemStyle: {
+//                     shadowBlur: 10,
+//                     shadowOffsetX: 0,
+//                     shadowColor: 'rgba(0, 0, 0, 0.5)',
+//                 },
+//             },
+//         },
+//     ],
+// });
+
+
+
 // 动态更新图表数据
 watch(vulnerabilitiesDistribution, (newData) => {
     // 过滤掉 value 为 0 的数据
@@ -513,12 +564,23 @@ watch(vulnerabilitiesDistribution, (newData) => {
                 trigger: 'item',
             },
             legend: {
+
                 orient: 'vertical',
                 left: 'left',
+                top: 'middle', // 标签垂直居中
+                textStyle: {
+        fontSize: 10,  // 设置字体大小
+    },
             },
+            grid: {
+        left: '80%',  // 让饼图右对齐
+    },
             series: [
                 {
                     name: '漏洞种类',
+                    label: {
+                show: false,  // 隐藏饼图标签
+            },
                     type: 'pie',
                     radius: '50%',
                     data: filteredData, // 使用过滤后的数据
